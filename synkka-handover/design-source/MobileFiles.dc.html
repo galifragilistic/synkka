@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<title>Synkka – mobiili, tiedostot</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F5FD1}a:hover{color:#174AA6}
+button,input{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F8FA; font-family: Inter, system-ui, sans-serif; color: #0F172A; font-size: 15px; display: flex; flex-direction: column; overflow: hidden">
+
+<header style="padding: 56px 20px 12px; display: flex; flex-direction: column; gap: 16px; background: #FFFFFF">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em">Tiedostot</h1>
+<button type="button" aria-label="Lisää tiedosto" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: {{accent}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+</button>
+</div>
+<label style="display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; border-radius: 12px; background: #F1F3F6; color: #5B6474">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Hae</span>
+<input type="search" placeholder="Hae tiedostoja" style="flex: 1; min-width: 0; border: none; background: transparent; font-size: 15px; color: #0F172A; outline: none">
+</label>
+</header>
+
+<div style="flex: 1; overflow: hidden; padding: 16px 20px; display: flex; flex-direction: column; gap: 20px">
+
+<a href="MobileSync.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; background: #EAF0FB; color: #0F172A; text-decoration: none">
+<div style="width: 36px; height: 36px; border-radius: 18px; background: {{accent}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2"></path><path d="M3 12a9 9 0 0 1 15.5-6.2"></path><path d="M18 2v4h-4"></path><path d="M6 22v-4h4"></path></svg>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600; font-size: 15px">Synkronoidaan 2 tiedostoa</span>
+<span style="font-size: 13px; color: #3B4352">1 ristiriita odottaa ratkaisua</span>
+</div>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B4352" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+</a>
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 13px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: 0.05em">Kansiot</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{folders}}" as="k" hint-placeholder-count="4">
+<a href="#" style="display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E3E6EB; color: #0F172A; text-decoration: none">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F5FD1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600; font-size: 15px">{{k.name}}</span>
+<span style="font-size: 12px; color: #5B6474">{{k.meta}}</span>
+</div>
+</a>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 4px">
+<h2 style="margin: 0 0 8px; font-size: 13px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: 0.05em">Viimeisimmät</h2>
+<sc-for list="{{recent}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 12px; min-height: 56px">
+<div style="width: 40px; height: 40px; border-radius: 10px; background: #FFFFFF; border: 1px solid #E3E6EB; color: #3B4352; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path></svg></div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{r.name}}</span>
+<span style="font-size: 13px; color: #5B6474">{{r.meta}}</span>
+</div>
+<sc-if value="{{r.synced}}" hint-placeholder-val="{{true}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1E7F4F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Synkronoitu"><circle cx="12" cy="12" r="9"></circle><path d="M8 12l3 3 5-6"></path></svg></sc-if>
+<sc-if value="{{r.syncing}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F5FD1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Synkronoidaan"><path d="M21 12a9 9 0 0 1-15.5 6.2"></path><path d="M3 12a9 9 0 0 1 15.5-6.2"></path><path d="M18 2v4h-4"></path><path d="M6 22v-4h4"></path></svg></sc-if>
+<sc-if value="{{r.conflict}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Ristiriita"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4"></path><path d="M12 17.5v.5"></path></svg></sc-if>
+<sc-if value="{{r.offline}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B4352" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Saatavilla offline-tilassa"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v8"></path><path d="M8.5 12l3.5 3.5 3.5-3.5"></path></svg></sc-if>
+</div>
+</sc-for>
+</section>
+</div>
+
+<nav aria-label="Välilehdet" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 8px 8px 28px; background: #FFFFFF; border-top: 1px solid #E3E6EB">
+<a href="#" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 48px; justify-content: center; font-size: 11px; font-weight: 600; color: {{accent}}; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>Tiedostot</a>
+<a href="#" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 48px; justify-content: center; font-size: 11px; font-weight: 500; color: #5B6474; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"></path><path d="M7 8l5-5 5 5"></path><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"></path></svg>Kuvat</a>
+<a href="MobileSync.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 48px; justify-content: center; font-size: 11px; font-weight: 500; color: #5B6474; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2"></path><path d="M3 12a9 9 0 0 1 15.5-6.2"></path><path d="M18 2v4h-4"></path><path d="M6 22v-4h4"></path></svg>Synkronointi</a>
+<a href="#" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 48px; justify-content: center; font-size: 11px; font-weight: 500; color: #5B6474; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Tili</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1F5FD1","options":["#1F5FD1","#0F766E","#6D28D9","#0F172A"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = (x) => ({ synced: x === 'synced', syncing: x === 'syncing', conflict: x === 'conflict', offline: x === 'offline' });
+    return {
+      accent: this.props.accent ?? '#1F5FD1',
+      folders: [
+        { name: 'Projektit', meta: '6 kansiota' },
+        { name: 'Kuvat', meta: '1 284 kuvaa' },
+        { name: 'Asiakirjat', meta: '42 tiedostoa' },
+        { name: 'Jaetut', meta: '3 jäsentä' }
+      ],
+      recent: [
+        Object.assign({ name: 'Esitys_Q4.pptx', meta: 'Lähetetään · 64 %' }, s('syncing')),
+        Object.assign({ name: 'Budjetti_2027.xlsx', meta: 'Kaksi versiota' }, s('conflict')),
+        Object.assign({ name: 'Tarjous_v3.docx', meta: 'Muokattu 11.20' }, s('synced')),
+        Object.assign({ name: 'Matkasuunnitelma.pdf', meta: 'Tallennettu laitteelle' }, s('offline'))
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

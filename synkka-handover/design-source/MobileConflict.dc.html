@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<title>Synkka – mobiili, ristiriidan ratkaisu</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F5FD1}a:hover{color:#174AA6}
+button,input{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F8FA; font-family: Inter, system-ui, sans-serif; color: #0F172A; font-size: 15px; display: flex; flex-direction: column; overflow: hidden">
+
+<header style="padding: 56px 12px 8px; display: flex; align-items: center; gap: 4px">
+<a href="MobileSync.dc.html" aria-label="Takaisin" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #0F172A"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 style="margin: 0; font-size: 20px; font-weight: 700">Ratkaise ristiriita</h1>
+</header>
+
+<div style="flex: 1; overflow: hidden; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; gap: 12px; padding: 14px 16px; border-radius: 14px; background: #FDECEA; color: #7A1A12">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4"></path><path d="M12 17.5v.5"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-weight: 600">Budjetti_2027.xlsx</span>
+<span style="font-size: 13px; line-height: 1.45">Tiedostoa muokattiin kahdella laitteella ennen kuin muutokset ehtivät synkronoitua.</span>
+</div>
+</div>
+
+<fieldset style="border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<legend style="padding: 0; margin-bottom: 10px; font-size: 13px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: 0.05em">Mikä versio säilytetään?</legend>
+<sc-for list="{{options}}" as="o" hint-placeholder-count="3">
+<label style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 14px; background: #FFFFFF; border: {{o.border}}; cursor: pointer">
+<input type="radio" name="version" checked="{{o.selected}}" onChange="{{o.pick}}" style="position: absolute; opacity: 0; width: 1px; height: 1px">
+<span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 11px; border: {{o.ring}}; box-sizing: border-box; flex-shrink: 0; display: flex; align-items: center; justify-content: center"><span style="width: 10px; height: 10px; border-radius: 5px; background: {{o.dot}}"></span></span>
+<span style="width: 40px; height: 40px; border-radius: 10px; background: #F1F3F6; color: #3B4352; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+<sc-if value="{{o.phone}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"></rect><path d="M11 18h2"></path></svg></sc-if>
+<sc-if value="{{o.laptop}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="11" rx="1.5"></rect><path d="M2 19h20"></path></svg></sc-if>
+<sc-if value="{{o.both}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"></path></svg></sc-if>
+</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600">{{o.title}}</span>
+<span style="font-size: 13px; color: #5B6474">{{o.meta}}</span>
+</span>
+</label>
+</sc-for>
+</fieldset>
+
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #5B6474">Hylätty versio säilyy versiohistoriassa 30 päivää, joten sen voi palauttaa myöhemmin.</p>
+</div>
+
+<div style="padding: 16px 20px 36px; display: flex; flex-direction: column; gap: 8px; background: #F7F8FA">
+<button type="button" style="height: 52px; border-radius: 14px; border: none; background: {{accent}}; color: #FFFFFF; font-size: 16px; font-weight: 600">{{cta}}</button>
+<a href="MobileSync.dc.html" style="height: 44px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; text-decoration: none">Päätä myöhemmin</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1F5FD1","options":["#1F5FD1","#0F766E","#6D28D9","#0F172A"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { picked: 'both' };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#1F5FD1';
+    const defs = [
+      { id: 'phone', title: 'Tämän iPhonen versio', meta: 'Muokattu tänään 13.05 · 412 kt', cta: 'Säilytä iPhonen versio' },
+      { id: 'laptop', title: 'MacBook Pron versio', meta: 'Muokattu tänään 13.02 · 398 kt', cta: 'Säilytä MacBookin versio' },
+      { id: 'both', title: 'Säilytä molemmat', meta: 'Toinen tallennetaan erilliseksi kopioksi', cta: 'Säilytä molemmat' }
+    ];
+    const picked = this.state.picked;
+    return {
+      accent,
+      cta: (defs.find((d) => d.id === picked) || defs[2]).cta,
+      options: defs.map((d) => {
+        const selected = d.id === picked;
+        return Object.assign({}, d, {
+          selected,
+          phone: d.id === 'phone', laptop: d.id === 'laptop', both: d.id === 'both',
+          border: selected ? '2px solid ' + accent : '1px solid #E3E6EB',
+          ring: selected ? '2px solid ' + accent : '2px solid #8A93A3',
+          dot: selected ? accent : 'transparent',
+          pick: () => this.setState({ picked: d.id })
+        });
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

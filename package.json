@@ -1,0 +1,22 @@
+{
+  "name": "synkka",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npm run test -w @synkka/core",
+    "desktop:dev": "npm run tauri:dev -w @synkka/desktop",
+    "desktop:web": "npm run dev -w @synkka/desktop",
+    "desktop:build": "npm run tauri:build -w @synkka/desktop",
+    "mobile:start": "npm run start -w @synkka/mobile",
+    "mobile:android": "npm run android -w @synkka/mobile",
+    "mobile:web": "npm run web -w @synkka/mobile",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}

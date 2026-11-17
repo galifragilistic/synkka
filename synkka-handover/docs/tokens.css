@@ -1,0 +1,47 @@
+/* Synkka design tokens – generated from tokens.json */
+:root {
+  --bg-canvas: #F7F8FA;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F1F3F6;
+  --bg-accent-soft: #EAF0FB;
+  --bg-success-soft: #E8F4EE;
+  --bg-danger-soft: #FDECEA;
+
+  --text-primary: #0F172A;
+  --text-secondary: #3B4352;
+  --text-muted: #5B6474;
+  --text-on-accent: #FFFFFF;
+  --text-danger-strong: #7A1A12;
+
+  --border-default: #E3E6EB;
+  --border-control: #D5DAE1;
+  --border-divider: #F0F2F5;
+  --border-radio-idle: #8A93A3;
+
+  --accent: #1F5FD1;
+  --accent-strong: #174AA6;
+
+  --status-synced: #1E7F4F;
+  --status-synced-text: #1E6B44;
+  --status-syncing: #1F5FD1;
+  --status-syncing-text: #174AA6;
+  --status-pending: #9A4508;
+  --status-conflict: #B42318;
+  --status-cloud-only: #5B6474;
+  --status-offline-available: #3B4352;
+
+  --track: #E3E6EB;
+  --toggle-off: #C7CDD6;
+
+  --font-sans: Inter, system-ui, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-pill: 999px;
+
+  --touch-target: 44px;
+  --shadow-toggle-thumb: 0 1px 2px rgba(15, 23, 42, 0.25);
+}

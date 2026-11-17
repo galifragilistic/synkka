@@ -1,0 +1,151 @@
+{
+  "app": {
+    "name": "Synkka"
+  },
+  "nav": {
+    "allFiles": "Kaikki tiedostot",
+    "recent": "Viimeisimmät",
+    "shared": "Jaetut",
+    "devices": "Laitteet",
+    "trash": "Roskakori",
+    "mainMenu": "Päävalikko",
+    "tabs": "Välilehdet",
+    "tabFiles": "Tiedostot",
+    "tabPhotos": "Kuvat",
+    "tabSync": "Synkronointi",
+    "tabAccount": "Tili",
+    "back": "Takaisin"
+  },
+  "actions": {
+    "addFiles": "Lisää tiedostoja",
+    "addFile": "Lisää tiedosto",
+    "shareFolder": "Jaa kansio",
+    "newFolder": "Uusi kansio",
+    "pause": "Keskeytä",
+    "resume": "Jatka",
+    "syncNow": "Synkronoi nyt",
+    "settings": "Asetukset",
+    "showHistory": "Näytä koko historia"
+  },
+  "search": {
+    "label": "Hae tiedostoja",
+    "placeholderDesktop": "Hae tiedostoja ja kansioita",
+    "placeholderMobile": "Hae tiedostoja"
+  },
+  "storage": {
+    "title": "Tallennustila",
+    "used": "{used} / {total} käytössä",
+    "percent": "{pct} %"
+  },
+  "table": {
+    "name": "Nimi",
+    "status": "Tila",
+    "modified": "Muokattu",
+    "size": "Koko",
+    "items": {
+      "one": "{count} kohde",
+      "other": "{count} kohdetta"
+    }
+  },
+  "status": {
+    "synced": "Synkronoitu",
+    "syncing": "Lähetetään {pct} %",
+    "pending": "Jonossa",
+    "conflict": "Ristiriita",
+    "conflictAction": "Ristiriita – ratkaise",
+    "cloudOnly": "Vain pilvessä",
+    "offlineAvailable": "Tallennettu laitteelle",
+    "done": "Valmis",
+    "twoVersions": "Kaksi versiota",
+    "syncingShort": "Lähetetään · {pct} %",
+    "modifiedAt": "Muokattu {when}",
+    "queued": "Jonossa"
+  },
+  "sync": {
+    "title": "Synkronointi",
+    "activeCount": {
+      "one": "Synkronoidaan {count} tiedosto",
+      "other": "Synkronoidaan {count} tiedostoa"
+    },
+    "conflictsWaiting": {
+      "one": "{count} ristiriita odottaa ratkaisua",
+      "other": "{count} ristiriitaa odottaa ratkaisua"
+    },
+    "networkEta": "{network} · noin {eta} jäljellä",
+    "paused": "Synkronointi keskeytetty",
+    "allSynced": "Kaikki synkronoitu",
+    "queue": "Jono",
+    "settings": "Asetukset",
+    "resolveConflictFor": "{file} – ratkaise ristiriita",
+    "bytesProgress": "{done} / {total}",
+    "percent": "{pct} %"
+  },
+  "settings": {
+    "wifiOnly": "Vain Wi-Fi-yhteydellä",
+    "wifiOnlyHint": "Ei mobiilidatan käyttöä",
+    "photoBackup": "Kuvien varmuuskopiointi",
+    "photoBackupHint": "Uudet kuvat Kuvat-kansioon",
+    "batterySaver": "Akunsäästö",
+    "batterySaverHint": "Tauko, kun akkua alle 20 %"
+  },
+  "devices": {
+    "title": "Laitteet",
+    "thisDevice": "(tämä laite)",
+    "syncingNow": "Synkronoidaan nyt",
+    "upToDate": "Ajan tasalla · {ago}",
+    "lastSeen": "Viimeksi {when}",
+    "online": "Verkossa",
+    "offline": "Ei verkossa"
+  },
+  "activity": {
+    "title": "Viimeisin toiminta",
+    "editedHere": "muokattu tällä laitteella",
+    "editedConcurrently": "muokattu kahdella laitteella samaan aikaan",
+    "sharedWith": "jaettu {count} henkilölle"
+  },
+  "conflict": {
+    "title": "Ratkaise ristiriita",
+    "explanation": "Tiedostoa muokattiin kahdella laitteella ennen kuin muutokset ehtivät synkronoitua.",
+    "question": "Mikä versio säilytetään?",
+    "versionOf": "{deviceGenitive} versio",
+    "thisDeviceVersion": "Tämän {deviceGenitive} versio",
+    "keepBoth": "Säilytä molemmat",
+    "keepBothHint": "Toinen tallennetaan erilliseksi kopioksi",
+    "versionMeta": "Muokattu {when} · {size}",
+    "historyNote": "Hylätty versio säilyy versiohistoriassa 30 päivää, joten sen voi palauttaa myöhemmin.",
+    "decideLater": "Päätä myöhemmin",
+    "cta": {
+      "keepLocal": "Säilytä {deviceGenitive} versio",
+      "keepRemote": "Säilytä {deviceGenitive} versio",
+      "keepBoth": "Säilytä molemmat"
+    },
+    "resolvedToast": "Ristiriita ratkaistu",
+    "dialogLabel": "Ratkaise ristiriita: {file}"
+  },
+  "time": {
+    "today": "Tänään {time}",
+    "yesterday": "Eilen",
+    "minutesAgo": "{n} min sitten",
+    "hoursAgo": "{n} h sitten",
+    "yesterdayAt": "eilen {time}",
+    "todayAt": "tänään {time}",
+    "etaMinutes": "{n} min"
+  },
+  "_notes": {
+    "deviceGenitive": "Finnish genitive of the device name, e.g. iPhone → iPhonen, MacBook Pro → MacBook Pron / MacBookin. Store it per device (Device.nameGenitive); do not append 'n' automatically.",
+    "added": "Keys added during implementation (not in handover): status.syncingShort, status.modifiedAt, status.queued, sync.bytesProgress, sync.percent, network.*, storage.percent, common.*, conflict.dialogLabel, time.yesterdayAt, time.todayAt, time.etaMinutes, files.folders, files.recent; plural forms {one, other} for table.items, sync.activeCount, sync.conflictsWaiting."
+  },
+  "network": {
+    "wifi": "Wi-Fi",
+    "cellular": "Mobiiliverkko",
+    "offline": "Ei verkkoyhteyttä"
+  },
+  "common": {
+    "close": "Sulje",
+    "notDesigned": "Tätä näkymää ei ole vielä suunniteltu."
+  },
+  "files": {
+    "folders": "Kansiot",
+    "recent": "Viimeisimmät"
+  }
+}

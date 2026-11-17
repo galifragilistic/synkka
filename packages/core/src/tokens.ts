@@ -1,0 +1,137 @@
+// Design tokens. Mirrors synkka-handover/docs/tokens.json (single source in code).
+// Components must read colors/sizes from here (or the CSS variables generated from it).
+
+const accentDefault = '#1F5FD1';
+
+export const tokens = {
+  color: {
+    bg: {
+      canvas: '#F7F8FA',
+      surface: '#FFFFFF',
+      subtle: '#F1F3F6',
+      accentSoft: '#EAF0FB',
+      successSoft: '#E8F4EE',
+      dangerSoft: '#FDECEA',
+    },
+    text: {
+      primary: '#0F172A',
+      secondary: '#3B4352',
+      muted: '#5B6474',
+      onAccent: '#FFFFFF',
+      dangerStrong: '#7A1A12',
+    },
+    border: {
+      default: '#E3E6EB',
+      control: '#D5DAE1',
+      divider: '#F0F2F5',
+      radioIdle: '#8A93A3',
+    },
+    accent: {
+      default: accentDefault,
+      strong: '#174AA6',
+      alternatives: ['#0F766E', '#6D28D9', '#0F172A'] as const,
+    },
+    status: {
+      synced: '#1E7F4F',
+      syncedText: '#1E6B44',
+      syncing: '#1F5FD1',
+      syncingText: '#174AA6',
+      pending: '#9A4508',
+      conflict: '#B42318',
+      cloudOnly: '#5B6474',
+      offlineAvailable: '#3B4352',
+    },
+    toggle: { trackOff: '#C7CDD6', trackOn: accentDefault, thumb: '#FFFFFF' },
+    track: '#E3E6EB',
+    /** Scrim behind modal dialogs (not in handover tokens; derived from text.primary). */
+    scrim: 'rgba(15, 23, 42, 0.4)',
+  },
+  font: {
+    family: { sans: 'Inter, system-ui, sans-serif' },
+    weight: { regular: 400, medium: 500, semibold: 600, bold: 700 },
+    size: {
+      caption: 11,
+      label: 12,
+      small: 13,
+      body: 14,
+      bodyMobile: 15,
+      title: 17,
+      h2: 15,
+      screenTitle: 20,
+      h1Desktop: 24,
+      h1Mobile: 28,
+      display: 32,
+    },
+    overline: { size: 13, weight: 600, letterSpacing: 0.05 },
+    tableHeader: { size: 12, weight: 600, letterSpacing: 0.04 },
+  },
+  space: { 1: 2, 2: 4, 3: 8, 4: 10, 5: 12, 6: 14, 7: 16, 8: 20, 9: 24, 10: 28 },
+  radius: { sm: 8, md: 10, lg: 12, xl: 14, '2xl': 18, pill: 999 },
+  size: {
+    touchTarget: 44,
+    buttonDesktop: 40,
+    buttonDesktopSmall: 36,
+    buttonMobile: 44,
+    buttonMobilePrimary: 52,
+    iconSm: 16,
+    iconMd: 18,
+    iconLg: 22,
+    tableRow: 56,
+    sidebar: 232,
+    progressBar: 4,
+    storageBar: 6,
+    toggle: { w: 48, h: 28, thumb: 22 },
+    progressRing: { size: 132, stroke: 10 },
+  },
+  shadow: { toggleThumb: '0 1px 2px rgba(15,23,42,0.25)' },
+  icon: { strokeWidth: 2, statusStrokeWidth: 2.2 },
+  motion: { durationMs: 200, easing: 'cubic-bezier(0, 0, 0.2, 1)' },
+} as const;
+
+export type Tokens = typeof tokens;
+
+/** CSS custom properties, same names as docs/tokens.css. */
+export function cssVariables(accent: string = tokens.color.accent.default): Record<string, string> {
+  const c = tokens.color;
+  return {
+    '--bg-canvas': c.bg.canvas,
+    '--bg-surface': c.bg.surface,
+    '--bg-subtle': c.bg.subtle,
+    '--bg-accent-soft': c.bg.accentSoft,
+    '--bg-success-soft': c.bg.successSoft,
+    '--bg-danger-soft': c.bg.dangerSoft,
+    '--text-primary': c.text.primary,
+    '--text-secondary': c.text.secondary,
+    '--text-muted': c.text.muted,
+    '--text-on-accent': c.text.onAccent,
+    '--text-danger-strong': c.text.dangerStrong,
+    '--border-default': c.border.default,
+    '--border-control': c.border.control,
+    '--border-divider': c.border.divider,
+    '--border-radio-idle': c.border.radioIdle,
+    '--accent': accent,
+    '--accent-strong': c.accent.strong,
+    '--status-synced': c.status.synced,
+    '--status-synced-text': c.status.syncedText,
+    '--status-syncing': c.status.syncing,
+    '--status-syncing-text': c.status.syncingText,
+    '--status-pending': c.status.pending,
+    '--status-conflict': c.status.conflict,
+    '--status-cloud-only': c.status.cloudOnly,
+    '--status-offline-available': c.status.offlineAvailable,
+    '--track': c.track,
+    '--toggle-off': c.toggle.trackOff,
+    '--scrim': c.scrim,
+    '--font-sans': tokens.font.family.sans,
+    '--radius-sm': `${tokens.radius.sm}px`,
+    '--radius-md': `${tokens.radius.md}px`,
+    '--radius-lg': `${tokens.radius.lg}px`,
+    '--radius-xl': `${tokens.radius.xl}px`,
+    '--radius-2xl': `${tokens.radius['2xl']}px`,
+    '--radius-pill': `${tokens.radius.pill}px`,
+    '--touch-target': `${tokens.size.touchTarget}px`,
+    '--shadow-toggle-thumb': tokens.shadow.toggleThumb,
+    '--motion-duration': `${tokens.motion.durationMs}ms`,
+    '--motion-easing': tokens.motion.easing,
+  };
+}

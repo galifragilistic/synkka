@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<title>Synkka – mobiili, synkronointi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F5FD1}a:hover{color:#174AA6}
+button,input{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F8FA; font-family: Inter, system-ui, sans-serif; color: #0F172A; font-size: 15px; display: flex; flex-direction: column; overflow: hidden">
+
+<header style="padding: 56px 12px 8px; display: flex; align-items: center; gap: 4px; background: #F7F8FA">
+<a href="MobileFiles.dc.html" aria-label="Takaisin" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #0F172A"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 style="margin: 0; font-size: 20px; font-weight: 700">Synkronointi</h1>
+</header>
+
+<div style="flex: 1; overflow: hidden; padding: 8px 20px 24px; display: flex; flex-direction: column; gap: 20px">
+
+<section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 18px; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px">
+<div style="width: 132px; height: 132px; position: relative; display: flex; align-items: center; justify-content: center">
+<svg width="132" height="132" viewBox="0 0 132 132" style="position: absolute; left: 0; top: 0; transform: rotate(-90deg)" aria-hidden="true"><circle cx="66" cy="66" r="56" fill="none" stroke="#E3E6EB" stroke-width="10"></circle><circle cx="66" cy="66" r="56" fill="none" stroke="{{accent}}" stroke-width="10" stroke-linecap="round" stroke-dasharray="352" stroke-dashoffset="127"></circle></svg>
+<div style="display: flex; flex-direction: column; align-items: center">
+<span style="font-size: 32px; font-weight: 700; letter-spacing: -0.02em">64 %</span>
+<span style="font-size: 12px; color: #5B6474">24 / 38 Mt</span>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center">
+<span style="font-size: 17px; font-weight: 600">Synkronoidaan 2 tiedostoa</span>
+<span style="font-size: 13px; color: #5B6474">Wi-Fi · noin 1 min jäljellä</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%">
+<button type="button" style="height: 44px; border-radius: 12px; border: 1px solid #D5DAE1; background: #FFFFFF; color: #0F172A; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14"></path><path d="M15 5v14"></path></svg>Keskeytä</button>
+<button type="button" style="height: 44px; border-radius: 12px; border: none; background: {{accent}}; color: #FFFFFF; font-size: 15px; font-weight: 600">Synkronoi nyt</button>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 13px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: 0.05em">Jono</h2>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 4px 16px">
+<sc-for list="{{queue}}" as="q" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-bottom: 1px solid #F0F2F5">
+<div style="display: flex; justify-content: space-between; gap: 12px">
+<span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{q.name}}</span>
+<span style="font-size: 13px; color: #5B6474; flex-shrink: 0">{{q.state}}</span>
+</div>
+<div style="height: 4px; border-radius: 2px; background: #E3E6EB; overflow: hidden"><div style="width: {{q.pct}}; height: 4px; background: {{q.bar}}"></div></div>
+</div>
+</sc-for>
+<a href="MobileConflict.dc.html" style="display: flex; align-items: center; gap: 10px; min-height: 52px; color: #B42318; font-weight: 600; font-size: 14px; text-decoration: none">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4"></path><path d="M12 17.5v.5"></path></svg>
+<span style="flex: 1">Budjetti_2027.xlsx – ratkaise ristiriita</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+</a>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 13px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: 0.05em">Asetukset</h2>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 0 16px">
+<sc-for list="{{settings}}" as="s" hint-placeholder-count="3">
+<label style="display: flex; align-items: center; gap: 12px; min-height: 56px; border-bottom: 1px solid #F0F2F5; cursor: pointer">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 500">{{s.label}}</span>
+<span style="font-size: 12px; color: #5B6474">{{s.hint}}</span>
+</span>
+<input type="checkbox" checked="{{s.on}}" onChange="{{s.toggle}}" style="position: absolute; opacity: 0; width: 1px; height: 1px">
+<span aria-hidden="true" style="width: 48px; height: 28px; border-radius: 14px; background: {{s.track}}; display: flex; align-items: center; padding: 3px; box-sizing: border-box; justify-content: {{s.justify}}; flex-shrink: 0"><span style="width: 22px; height: 22px; border-radius: 11px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(15,23,42,0.25)"></span></span>
+</label>
+</sc-for>
+</div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1F5FD1","options":["#1F5FD1","#0F766E","#6D28D9","#0F172A"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { wifi: true, photos: true, battery: false };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#1F5FD1';
+    const defs = [
+      { key: 'wifi', label: 'Vain Wi-Fi-yhteydellä', hint: 'Ei mobiilidatan käyttöä' },
+      { key: 'photos', label: 'Kuvien varmuuskopiointi', hint: 'Uudet kuvat Kuvat-kansioon' },
+      { key: 'battery', label: 'Akunsäästö', hint: 'Tauko, kun akkua alle 20 %' }
+    ];
+    return {
+      accent,
+      queue: [
+        { name: 'Esitys_Q4.pptx', state: 'Lähetetään 64 %', pct: '64%', bar: accent },
+        { name: 'Sopimusluonnos.pdf', state: 'Jonossa', pct: '0%', bar: accent },
+        { name: 'IMG_4821.heic', state: 'Valmis', pct: '100%', bar: '#1E7F4F' }
+      ],
+      settings: defs.map((d) => {
+        const on = !!this.state[d.key];
+        return Object.assign({}, d, {
+          on,
+          track: on ? accent : '#C7CDD6',
+          justify: on ? 'flex-end' : 'flex-start',
+          toggle: () => this.setState({ [d.key]: !on })
+        });
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

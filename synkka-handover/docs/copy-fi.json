@@ -1,0 +1,118 @@
+{
+  "app": {
+    "name": "Synkka"
+  },
+  "nav": {
+    "allFiles": "Kaikki tiedostot",
+    "recent": "Viimeisimmät",
+    "shared": "Jaetut",
+    "devices": "Laitteet",
+    "trash": "Roskakori",
+    "mainMenu": "Päävalikko",
+    "tabs": "Välilehdet",
+    "tabFiles": "Tiedostot",
+    "tabPhotos": "Kuvat",
+    "tabSync": "Synkronointi",
+    "tabAccount": "Tili",
+    "back": "Takaisin"
+  },
+  "actions": {
+    "addFiles": "Lisää tiedostoja",
+    "addFile": "Lisää tiedosto",
+    "shareFolder": "Jaa kansio",
+    "newFolder": "Uusi kansio",
+    "pause": "Keskeytä",
+    "resume": "Jatka",
+    "syncNow": "Synkronoi nyt",
+    "settings": "Asetukset",
+    "showHistory": "Näytä koko historia"
+  },
+  "search": {
+    "label": "Hae tiedostoja",
+    "placeholderDesktop": "Hae tiedostoja ja kansioita",
+    "placeholderMobile": "Hae tiedostoja"
+  },
+  "storage": {
+    "title": "Tallennustila",
+    "used": "{used} / {total} käytössä"
+  },
+  "table": {
+    "name": "Nimi",
+    "status": "Tila",
+    "modified": "Muokattu",
+    "size": "Koko",
+    "items": "{count} kohdetta"
+  },
+  "status": {
+    "synced": "Synkronoitu",
+    "syncing": "Lähetetään {pct} %",
+    "pending": "Jonossa",
+    "conflict": "Ristiriita",
+    "conflictAction": "Ristiriita – ratkaise",
+    "cloudOnly": "Vain pilvessä",
+    "offlineAvailable": "Tallennettu laitteelle",
+    "done": "Valmis",
+    "twoVersions": "Kaksi versiota"
+  },
+  "sync": {
+    "title": "Synkronointi",
+    "activeCount": "Synkronoidaan {count} tiedostoa",
+    "conflictsWaiting": "{count} ristiriita odottaa ratkaisua",
+    "networkEta": "{network} · noin {eta} jäljellä",
+    "paused": "Synkronointi keskeytetty",
+    "allSynced": "Kaikki synkronoitu",
+    "queue": "Jono",
+    "settings": "Asetukset",
+    "resolveConflictFor": "{file} – ratkaise ristiriita"
+  },
+  "settings": {
+    "wifiOnly": "Vain Wi-Fi-yhteydellä",
+    "wifiOnlyHint": "Ei mobiilidatan käyttöä",
+    "photoBackup": "Kuvien varmuuskopiointi",
+    "photoBackupHint": "Uudet kuvat Kuvat-kansioon",
+    "batterySaver": "Akunsäästö",
+    "batterySaverHint": "Tauko, kun akkua alle 20 %"
+  },
+  "devices": {
+    "title": "Laitteet",
+    "thisDevice": "(tämä laite)",
+    "syncingNow": "Synkronoidaan nyt",
+    "upToDate": "Ajan tasalla · {ago}",
+    "lastSeen": "Viimeksi {when}",
+    "online": "Verkossa",
+    "offline": "Ei verkossa"
+  },
+  "activity": {
+    "title": "Viimeisin toiminta",
+    "editedHere": "muokattu tällä laitteella",
+    "editedConcurrently": "muokattu kahdella laitteella samaan aikaan",
+    "sharedWith": "jaettu {count} henkilölle"
+  },
+  "conflict": {
+    "title": "Ratkaise ristiriita",
+    "explanation": "Tiedostoa muokattiin kahdella laitteella ennen kuin muutokset ehtivät synkronoitua.",
+    "question": "Mikä versio säilytetään?",
+    "versionOf": "{deviceGenitive} versio",
+    "thisDeviceVersion": "Tämän {deviceGenitive} versio",
+    "keepBoth": "Säilytä molemmat",
+    "keepBothHint": "Toinen tallennetaan erilliseksi kopioksi",
+    "versionMeta": "Muokattu {when} · {size}",
+    "historyNote": "Hylätty versio säilyy versiohistoriassa 30 päivää, joten sen voi palauttaa myöhemmin.",
+    "decideLater": "Päätä myöhemmin",
+    "cta": {
+      "keepLocal": "Säilytä {deviceGenitive} versio",
+      "keepRemote": "Säilytä {deviceGenitive} versio",
+      "keepBoth": "Säilytä molemmat"
+    },
+    "resolvedToast": "Ristiriita ratkaistu"
+  },
+  "time": {
+    "today": "Tänään {time}",
+    "yesterday": "Eilen",
+    "minutesAgo": "{n} min sitten",
+    "hoursAgo": "{n} h sitten"
+  },
+  "_notes": {
+    "deviceGenitive": "Finnish genitive of the device name, e.g. iPhone → iPhonen, MacBook Pro → MacBook Pron / MacBookin. Store it per device (Device.nameGenitive); do not append 'n' automatically."
+  }
+}
