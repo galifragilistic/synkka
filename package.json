@@ -13,7 +13,8 @@
     "mobile:start": "npm run start -w @synkka/mobile",
     "mobile:android": "npm run android -w @synkka/mobile",
     "mobile:web": "npm run web -w @synkka/mobile",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "icons": "node scripts/generate-icons.mjs"
   },
   "engines": {
     "node": ">=22.13"
