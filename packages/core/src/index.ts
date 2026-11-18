@@ -10,3 +10,4 @@ export * from './mock';
 export * from './syncthing/client';
 export * from './syncthing/conflicts';
 export * from './syncthing/service';
+export * from './syncthing/errors';

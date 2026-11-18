@@ -97,7 +97,13 @@
     "upToDate": "Ajan tasalla · {ago}",
     "lastSeen": "Viimeksi {when}",
     "online": "Verkossa",
-    "offline": "Ei verkossa"
+    "offline": "Ei verkossa",
+    "id": "Tunniste",
+    "lastSeenLabel": "Viimeksi nähty",
+    "remove": "Poista laite",
+    "removeConfirm": "Vahvista poisto",
+    "removed": "Laite poistettu",
+    "neverSeen": "Ei vielä yhteyttä"
   },
   "activity": {
     "title": "Viimeisin toiminta",
@@ -125,7 +131,11 @@
       "keepBoth": "Säilytä molemmat"
     },
     "resolvedToast": "Ristiriita ratkaistu",
-    "dialogLabel": "Ratkaise ristiriita: {file}"
+    "dialogLabel": "Ratkaise ristiriita: {file}",
+    "olderCopies": {
+      "one": "Lisäksi {count} vanhempi ristiriitaversio siirretään versiohistoriaan.",
+      "other": "Lisäksi {count} vanhempaa ristiriitaversiota siirretään versiohistoriaan."
+    }
   },
   "time": {
     "today": "Tänään {time}",
@@ -217,5 +227,46 @@
     "idleText": "Kaikki synkronoitu",
     "activeOne": "Synkronoidaan {count} tiedosto",
     "activeOther": "Synkronoidaan {count} tiedostoa"
+  },
+  "views": {
+    "recentEmpty": "Ei vielä muuttuneita tiedostoja.",
+    "sharedHint": "Valitse, mille laitteille kukin kansio synkronoidaan. Kansio pysyy tällä laitteella, vaikka jaon poistaa.",
+    "sharedWith": "Jaa laitteelle {name}",
+    "noOtherDevices": "Ei pariutettuja laitteita. Lisää laite Laitteet-näkymässä.",
+    "devicesHint": "Laitteet synkronoivat suoraan keskenään. Poistettu laite ei enää saa muutoksia.",
+    "trashHint": "Poistetut ja korvatut tiedostot sekä ristiriitojen hylätyt versiot säilyvät 30 päivää.",
+    "trashEmpty": "Roskakori on tyhjä.",
+    "restore": "Palauta",
+    "restored": "Palautettu: {name}",
+    "archived": "Siirretty roskakoriin",
+    "folder": "Kansio"
+  },
+  "ignore": {
+    "title": "Ohitettavat tiedostot",
+    "button": "Ohitettavat tiedostot",
+    "shared": "Kaikilla laitteilla",
+    "sharedHint": "Synkronoidaan kaikille laitteille, joilla kansio on.",
+    "local": "Vain tällä laitteella",
+    "localHint": "Ei vaikuta muihin laitteisiin.",
+    "syntax": "Yksi sääntö riville. * = mikä tahansa nimi, ** = myös alikansiot, / alussa = vain tämä polku kansion juuresta, ! alussa = synkronoi silti, (?d) alussa = saa poistaa, // = kommentti.",
+    "suggest": "Lisää Obsidian-suositukset",
+    "suggestGeneric": "Lisää yleiset suositukset",
+    "save": "Tallenna säännöt",
+    "saved": "Ohitussäännöt tallennettu",
+    "ignoreItem": "Älä synkronoi",
+    "ignoreItemHint": "Lopettaa synkronoinnin tälle kohteelle kaikilla laitteilla. Tiedosto jää laitteille ennalleen.",
+    "ignored": "Ei enää synkronoida: {name}"
+  },
+  "errors": {
+    "invalidName": "Tiedostonimessä on merkki, jota tämä laite ei salli ({chars}). Nimeä tiedosto uudelleen laitteella, jolla se on.",
+    "noSource": "Yksikään yhdistetty laite ei tarjoa tiedoston uusinta versiota.",
+    "permission": "Synkalla ei ole lupaa kirjoittaa tähän kansioon.",
+    "diskFull": "Laitteen tallennustila on täynnä.",
+    "generic": "Synkronointi epäonnistui: {error}",
+    "count": {
+      "one": "{count} tiedosto ei synkronoidu",
+      "other": "{count} tiedostoa ei synkronoidu"
+    },
+    "title": "Ei synkronoidu"
   }
 }

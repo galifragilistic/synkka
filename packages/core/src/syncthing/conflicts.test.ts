@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isConflictName, normalizeDeviceId, parseConflictName, versionsPath } from './conflicts';
+import { isConflictName, normalizeDeviceId, parseConflictName, versionsPath, withVersionTag } from './conflicts';
 import { folderListId, parseFolderListId } from './service';
 
 describe('syncthing conflict names', () => {
@@ -23,5 +23,9 @@ describe('syncthing conflict names', () => {
     expect(parseFolderListId(folderListId('abc', 'x/y'))).toEqual({ folder: 'abc', path: 'x/y' });
     expect(parseFolderListId('root')).toBeNull();
     expect(versionsPath('x/y.txt')).toBe('.stversions/x/y.txt');
+    expect(parseConflictName('a/app.sync-conflict-20260806-160925-46FUGHS.json')!.tag).toBe('20260806-160925');
+    expect(withVersionTag('.obsidian/app.json', '20260806-160925')).toBe('.obsidian/app~20260806-160925.json');
+    expect(withVersionTag('dir/README', '20260806-160925')).toBe('dir/README~20260806-160925');
+    expect(withVersionTag('.bashrc', 't')).toBe('.bashrc~t');
   });
 });

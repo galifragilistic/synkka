@@ -22,6 +22,8 @@ interface SynkkaEngineNative {
   openFile(path: string): boolean;
   /** false when no file manager could be opened. */
   openFolder(path: string): boolean;
+  readSharedIgnores(folderPath: string): Promise<string | null>;
+  writeSharedIgnores(folderPath: string, content: string): Promise<void>;
   /** Opens the system settings of one notification channel (e.g. to hide the idle one). */
   openNotificationSettings(channelId: string): void;
 }

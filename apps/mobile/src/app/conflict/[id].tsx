@@ -83,6 +83,7 @@ export default function ConflictScreen() {
 
             <Text style={[font(400, tokens.font.size.small), { color: colors.text.muted, lineHeight: 20 }]}>
               {t('conflict.historyNote')}
+              {conflict?.olderCopies ? ` ${t('conflict.olderCopies', { count: conflict.olderCopies })}` : ''}
             </Text>
           </ScrollView>
 

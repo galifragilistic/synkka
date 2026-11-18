@@ -128,6 +128,7 @@ a:hover, .link:hover { color: var(--accent-strong); }
 }
 .pill--active { background: var(--bg-success-soft); color: var(--status-synced-text); }
 .pill--paused { background: var(--bg-subtle); color: var(--text-secondary); }
+.pill--error { background: var(--bg-danger-soft); color: var(--text-danger-strong); }
 .pill--idle { background: var(--bg-subtle); color: var(--text-muted); }
 
 /* ---------- cards & table ---------- */
@@ -274,6 +275,33 @@ a:hover, .link:hover { color: var(--accent-strong); }
 .details__path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; font-weight: 400; }
 .details__devices { display: flex; flex-direction: column; gap: 6px; }
 .details__device { color: var(--text-primary); }
+
+/* ---------- sections: shared, devices, trash ---------- */
+.share-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.share-head { display: flex; align-items: center; gap: 12px; }
+.share-title { font-size: 15px; font-weight: 600; }
+.share-list { display: flex; flex-direction: column; }
+.share-row { display: flex; align-items: center; gap: 12px; min-height: 52px; border-top: 1px solid var(--border-divider); cursor: pointer; }
+.share-row--busy { opacity: 0.6; }
+.switch {
+  appearance: none; -webkit-appearance: none; flex-shrink: 0; margin: 0; cursor: pointer;
+  width: 48px; height: 28px; border-radius: 14px; background: var(--toggle-off); position: relative;
+  transition: background var(--motion-duration) var(--motion-easing);
+}
+.switch::after {
+  content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 11px;
+  background: var(--bg-surface); box-shadow: var(--shadow-toggle-thumb);
+  transition: transform var(--motion-duration) var(--motion-easing);
+}
+.switch:checked { background: var(--accent); }
+.switch:checked::after { transform: translateX(20px); }
+.switch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn--danger, .btn--danger:hover:not(:disabled) { border-color: var(--status-conflict); color: var(--status-conflict); }
+.ftable--trash .ftable__row { grid-template-columns: minmax(0, 3fr) minmax(0, 1.4fr) minmax(0, 1.2fr) minmax(0, 0.7fr) minmax(0, 1fr); }
+
+.dialog--wide { width: min(640px, calc(100vw - 32px)); }
+.field__textarea { height: auto; padding: 10px 12px; line-height: 1.5; resize: vertical; }
+.btn--push-left { margin-right: auto; }
 
 /* ---------- toast ---------- */
 .toast-region { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10; }

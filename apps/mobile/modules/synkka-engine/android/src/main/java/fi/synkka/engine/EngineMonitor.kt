@@ -62,10 +62,14 @@ object EngineMonitor {
     for (i in 0 until folders.length()) {
       val id = folders.getJSONObject(i).getString("id")
       val status = JSONObject(get("/rest/db/status?folder=${java.net.URLEncoder.encode(id, "UTF-8")}", 10_000))
-      localNeed[id] = status.optInt("needTotalItems", 0)
+      localNeed[id] = waiting(status)
       folderState[id] = status.optString("state", "idle")
     }
   }
+
+  /** Items still to transfer; ones that failed (e.g. a file name Android can't store) don't count. */
+  private fun waiting(status: JSONObject): Int =
+    maxOf(0, status.optInt("needTotalItems", 0) - status.optInt("pullErrors", 0))
 
   private fun activeCount(): Int {
     val local = localNeed.values.sum()
@@ -102,7 +106,7 @@ object EngineMonitor {
           since = maxOf(since, e.getLong("id"))
           val data = e.optJSONObject("data") ?: continue
           when (e.getString("type")) {
-            "FolderSummary" -> localNeed[data.getString("folder")] = data.getJSONObject("summary").optInt("needTotalItems", 0)
+            "FolderSummary" -> localNeed[data.getString("folder")] = waiting(data.getJSONObject("summary"))
             "FolderCompletion" -> remoteNeed["${data.getString("folder")}|${data.getString("device")}"] = data.optInt("needItems", 0)
             "StateChanged" -> folderState[data.getString("folder")] = data.optString("to", "idle")
             "DeviceDisconnected" -> {

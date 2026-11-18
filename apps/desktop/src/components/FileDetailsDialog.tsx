@@ -7,12 +7,13 @@ import { SyncStatusBadge } from './SyncStatusBadge';
 
 /** File details (not designed yet: uses the conflict dialog's modal and card patterns). */
 export function FileDetailsDialog({
-  fileId, onClose, onResolve, onError,
+  fileId, onClose, onResolve, onError, onIgnored,
 }: {
   fileId: string;
   onClose: () => void;
   onResolve: (conflictId: string) => void;
   onError: (message: string) => void;
+  onIgnored: (name: string) => void;
 }) {
   const sync = useSync();
   const ref = useRef<HTMLDialogElement>(null);
@@ -106,6 +107,24 @@ export function FileDetailsDialog({
         </dl>
 
         <div className="dialog__footer">
+          {info.relativePath && (
+            <Button
+              className="btn--push-left"
+              icon="close"
+              title={t('ignore.ignoreItemHint')}
+              onClick={() =>
+                sync.ignoreItem(info.id).then(
+                  () => {
+                    ref.current?.close();
+                    onIgnored(info.name);
+                  },
+                  (e) => onError(String(e?.message ?? e)),
+                )
+              }
+            >
+              {t('ignore.ignoreItem')}
+            </Button>
+          )}
           {(isFile ? info.parentAbsolutePath : info.absolutePath) && revealPath && (
             <Button icon="folder" onClick={() => run(() => revealPath!(info.absolutePath ?? info.parentAbsolutePath!))}>
               {revealLabel}

@@ -88,7 +88,10 @@ export function ConflictDialog({
           ))}
         </fieldset>
 
-        <p className="muted small note">{t('conflict.historyNote')}</p>
+        <p className="muted small note">
+          {t('conflict.historyNote')}
+          {conflict.olderCopies ? ` ${t('conflict.olderCopies', { count: conflict.olderCopies })}` : ''}
+        </p>
 
         <div className="dialog__footer">
           <Button variant="secondary" onClick={() => ref.current?.close()}>

@@ -18,6 +18,7 @@ const SETTINGS: { key: keyof SyncSettings; label: string; hint: string }[] = [
 function queueState(q: QueueItem): string {
   if (q.status === 'done') return t('status.done');
   if (q.status === 'queued') return t('status.queued');
+  if (q.status === 'error') return t('errors.title');
   return t('status.syncing', { pct: toPercent(q.progress) });
 }
 
@@ -85,15 +86,37 @@ export default function SyncScreen() {
           <View style={{ gap: 10 }}>
             <Text accessibilityRole="header" style={overline}>{t('sync.queue')}</Text>
             <View style={[ui.card, { paddingVertical: 4, paddingHorizontal: 16 }]}>
-              {queue.map((q) => (
-                <View key={q.fileId} style={[styles.queueRow, ui.divider]}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
-                    <Text style={[font(500), { flexShrink: 1 }]} numberOfLines={1}>{q.name}</Text>
-                    <Text style={[font(400, tokens.font.size.small), { color: colors.text.muted }]}>{queueState(q)}</Text>
+              {queue.map((q) =>
+                q.status === 'error' ? (
+                  // Failed item: icon + reason (status is never color alone); tap for details.
+                  <Pressable
+                    key={q.fileId}
+                    accessibilityRole="link"
+                    accessibilityLabel={`${q.name}, ${t('errors.title')}: ${q.error ?? ''}`}
+                    onPress={() => router.push({ pathname: '/file/[id]', params: { id: q.fileId } })}
+                    style={({ pressed }) => [styles.queueRow, ui.divider, pressed && { opacity: 0.7 }]}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <Icon name="alertTriangle" size={18} color={colors.status.conflict} strokeWidth={2.2} />
+                      <Text style={[font(500), { flexShrink: 1 }]} numberOfLines={1}>{q.name}</Text>
+                      <Text style={[font(600, tokens.font.size.small), { color: colors.status.conflict, marginLeft: 'auto' }]}>
+                        {queueState(q)}
+                      </Text>
+                    </View>
+                    {q.error ? (
+                      <Text style={[font(400, tokens.font.size.small), { color: colors.text.dangerStrong, lineHeight: 19 }]}>{q.error}</Text>
+                    ) : null}
+                  </Pressable>
+                ) : (
+                  <View key={q.fileId} style={[styles.queueRow, ui.divider]}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
+                      <Text style={[font(500), { flexShrink: 1 }]} numberOfLines={1}>{q.name}</Text>
+                      <Text style={[font(400, tokens.font.size.small), { color: colors.text.muted }]}>{queueState(q)}</Text>
+                    </View>
+                    <ProgressBar value={q.progress} color={q.status === 'done' ? colors.status.synced : accent} />
                   </View>
-                  <ProgressBar value={q.progress} color={q.status === 'done' ? colors.status.synced : accent} />
-                </View>
-              ))}
+                ),
+              )}
               {conflicts.map((c) => (
                 <Pressable
                   key={c.id}

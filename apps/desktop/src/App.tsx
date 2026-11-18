@@ -2,13 +2,19 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DEMO_FOLDER, ROOT, t, type EngineState, type FileItem, type Observable, type PendingDevice } from '@synkka/core';
 import { useDebounced, useNow, useObservable, useSync } from './hooks';
 import { isRealEngine, isTauri, revealLabel, revealPath } from './platform';
-import { Sidebar } from './components/Sidebar';
+import { Sidebar, type Section } from './components/Sidebar';
+import type { SharedFolder } from '@synkka/core';
+import { RecentView } from './views/RecentView';
+import { SharedView } from './views/SharedView';
+import { DevicesView } from './views/DevicesView';
+import { TrashView } from './views/TrashView';
 import { TopBar } from './components/TopBar';
 import { FileTable } from './components/FileTable';
 import { SidePanel } from './components/SidePanel';
 import { ConflictDialog } from './components/ConflictDialog';
 import { PairingDialog } from './components/PairingDialog';
 import { FileDetailsDialog } from './components/FileDetailsDialog';
+import { IgnoreDialog } from './components/IgnoreDialog';
 import { Button, Icon } from './components/primitives';
 
 type Crumb = { id: string; name: string };
@@ -26,15 +32,23 @@ export function App({ engine }: { engine?: Observable<EngineState> }) {
   const current = stack[stack.length - 1];
   const files = useObservable(() => sync.list(current.id), [sync, current.id]) ?? [];
 
+  const [section, setSection] = useState<Section>('all');
+  const select = (s: Section) => {
+    setSection(s);
+    setQuery('');
+  };
   const [query, setQuery] = useState('');
   const debounced = useDebounced(query.trim().toLocaleLowerCase('fi'), 150);
-  const visible = useMemo(
-    () => (debounced ? files.filter((f) => f.name.toLocaleLowerCase('fi').includes(debounced)) : files),
-    [files, debounced],
+  const filterItems = useCallback(
+    (items: FileItem[]) => (debounced ? items.filter((f) => f.name.toLocaleLowerCase('fi').includes(debounced)) : items),
+    [debounced],
   );
+  const visible = useMemo(() => filterItems(files), [files, filterItems]);
 
   const [conflictId, setConflictId] = useState<string | null>(null);
   const [detailsId, setDetailsId] = useState<string | null>(null);
+  const [ignoreFolder, setIgnoreFolder] = useState<SharedFolder | null>(null);
+  const closeIgnores = useCallback(() => setIgnoreFolder(null), []);
   const closeDetails = useCallback(() => setDetailsId(null), []);
   const showError = useCallback((m: string) => setToast(m), []);
   const revealCurrent = async () => {
@@ -73,6 +87,7 @@ export function App({ engine }: { engine?: Observable<EngineState> }) {
     const label = path.split(/[\\/]/).filter(Boolean).pop() ?? path;
     await sync.addFolder(path, label);
     setStack((s) => s.slice(0, 1));
+    setSection('all');
     setToast(t('folders.added'));
   };
 
@@ -80,7 +95,7 @@ export function App({ engine }: { engine?: Observable<EngineState> }) {
 
   return (
     <div className="app">
-      <Sidebar onAddFolder={addFolder} />
+      <Sidebar onAddFolder={addFolder} active={section} onSelect={select} />
       <main className="main">
         <TopBar query={query} onQuery={setQuery} overview={overview} />
         {engineState?.state === 'starting' && (
@@ -96,6 +111,22 @@ export function App({ engine }: { engine?: Observable<EngineState> }) {
           </div>
         )}
         <div className="content">
+          {section === 'recent' && (
+            <RecentView now={now} filter={filterItems} onDetails={(f) => setDetailsId(f.id)} onResolve={setConflictId} />
+          )}
+          {section === 'shared' && (
+            <SharedView
+              onError={showError}
+              onIgnores={setIgnoreFolder}
+              onOpenFolder={(f) => {
+                setSection('all');
+                setStack([{ id: ROOT, name: t('nav.allFiles') }, { id: f.listId, name: f.label }]);
+              }}
+            />
+          )}
+          {section === 'devices' && <DevicesView now={now} onPair={(prefill) => setPairing({ prefill })} onToast={showError} />}
+          {section === 'trash' && <TrashView now={now} query={debounced} onToast={showError} />}
+          {section === 'all' && (
           <section className="files" aria-labelledby="folder-title">
             <div className="files__head">
               <div className="files__title">
@@ -140,13 +171,30 @@ export function App({ engine }: { engine?: Observable<EngineState> }) {
               empty={engineState?.state === 'ready' ? t(atRoot ? 'folders.none' : 'folders.empty') : undefined}
             />
           </section>
-          <SidePanel now={now} onPair={(prefill) => setPairing({ prefill })} />
+          )}
+          {section !== 'devices' && <SidePanel now={now} onPair={(prefill) => setPairing({ prefill })} />}
         </div>
       </main>
 
       {conflictId && <ConflictDialog conflictId={conflictId} onClose={closeDialog} onResolved={resolved} />}
       {detailsId && (
-        <FileDetailsDialog fileId={detailsId} onClose={closeDetails} onResolve={setConflictId} onError={showError} />
+        <FileDetailsDialog
+          fileId={detailsId}
+          onClose={closeDetails}
+          onResolve={setConflictId}
+          onError={showError}
+          onIgnored={(name) => setToast(t('ignore.ignored', { name }))}
+        />
+      )}
+      {ignoreFolder && (
+        <IgnoreDialog
+          folderId={ignoreFolder.folderId}
+          folderLabel={ignoreFolder.label}
+          listId={ignoreFolder.listId}
+          onClose={closeIgnores}
+          onSaved={() => setToast(t('ignore.saved'))}
+          onError={showError}
+        />
       )}
       {pairing && (
         <PairingDialog

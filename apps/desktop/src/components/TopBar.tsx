@@ -6,6 +6,7 @@ function pill(o: SyncOverview | undefined): { tone: string; icon: IconName; text
   if (!o) return { tone: 'idle', icon: 'sync', text: '' };
   if (o.paused) return { tone: 'paused', icon: 'pause', text: t('sync.paused') };
   if (o.activeCount > 0) return { tone: 'active', icon: 'sync', text: t('sync.activeCount', { count: o.activeCount }) };
+  if (o.errorCount) return { tone: 'error', icon: 'alertTriangle', text: t('errors.count', { count: o.errorCount }) };
   return { tone: 'active', icon: 'checkCircle', text: t('sync.allSynced') };
 }
 

@@ -184,6 +184,34 @@ async fn reveal_path(engine: State<'_, Engine>, path: String) -> Result<(), Stri
     status.map(|_| ()).map_err(|e| e.to_string())
 }
 
+const SHARED_IGNORE_FILE: &str = ".stglobalignore";
+
+/// The shared ignore file of a synced folder: only `<folder root>/.stglobalignore` is allowed.
+async fn shared_ignore_path(engine: &Engine, folder_path: &str) -> Result<PathBuf, String> {
+    let roots = folder_roots(engine).await?;
+    let root = expand_home(folder_path);
+    if !roots.iter().any(|r| r == &root) {
+        return Err("not a synced folder".into());
+    }
+    Ok(root.join(SHARED_IGNORE_FILE))
+}
+
+#[tauri::command]
+async fn read_shared_ignores(engine: State<'_, Engine>, folder_path: String) -> Result<Option<String>, String> {
+    let p = shared_ignore_path(&engine, &folder_path).await?;
+    match std::fs::read_to_string(&p) {
+        Ok(s) => Ok(Some(s)),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[tauri::command]
+async fn write_shared_ignores(engine: State<'_, Engine>, folder_path: String, content: String) -> Result<(), String> {
+    let p = shared_ignore_path(&engine, &folder_path).await?;
+    std::fs::write(&p, content).map_err(|e| e.to_string())
+}
+
 /// Host name without the macOS ".local" suffix, used as the default device name.
 #[tauri::command]
 fn host_name() -> String {
@@ -303,7 +331,7 @@ pub fn run() {
             app.manage(engine);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![st_request, fs_rename, disk_usage, host_name, open_path, reveal_path])
+        .invoke_handler(tauri::generate_handler![st_request, fs_rename, disk_usage, host_name, open_path, reveal_path, read_shared_ignores, write_shared_ignores])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app, event| {

@@ -78,6 +78,7 @@ export interface StFolderStatus {
   needFiles: number;
   needBytes: number;
   needTotalItems: number;
+  pullErrors?: number;
   inSyncBytes: number;
   state: string;
   error: string;
@@ -211,6 +212,28 @@ export class SyncthingClient {
   }
   putFolder(folder: Partial<StFolderConfig> & { id: string }) {
     return this.t.request('PUT', `/rest/config/folders/${encodeURIComponent(folder.id)}`, folder);
+  }
+  /** Version history per path (trashcan/simple/staggered versioning). */
+  versions(folder: string) {
+    return this.get<Record<string, { versionTime: string; modTime: string; size: number }[]>>(`/rest/folder/versions?${q({ folder })}`);
+  }
+  /** Restores { path: versionTime } entries into the folder. */
+  restoreVersions(folder: string, versions: Record<string, string>) {
+    return this.t.request('POST', `/rest/folder/versions?${q({ folder })}`, versions);
+  }
+  /** Items that failed to sync in the last pull (path + raw error). */
+  folderErrors(folder: string) {
+    return this.get<{ errors: { path: string; error: string }[] | null }>(`/rest/folder/errors?${q({ folder })}`);
+  }
+  ignores(folder: string) {
+    return this.get<{ ignore: string[] | null; expanded: string[] | null; error: string | null }>(`/rest/db/ignores?${q({ folder })}`);
+  }
+  /** Replaces the folder's .stignore lines. */
+  setIgnores(folder: string, ignore: string[]) {
+    return this.t.request('POST', `/rest/db/ignores?${q({ folder })}`, { ignore });
+  }
+  deleteDevice(id: string) {
+    return this.t.request('DELETE', `/rest/config/devices/${encodeURIComponent(id)}`);
   }
   dismissPendingDevice(device: string) {
     return this.t.request('DELETE', `/rest/cluster/pending/devices?${q({ device })}`);

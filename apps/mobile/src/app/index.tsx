@@ -31,7 +31,9 @@ export default function FilesScreen() {
   const bannerSubtitle =
     overview.conflictCount > 0
       ? t('sync.conflictsWaiting', { count: overview.conflictCount })
-      : overview.network !== 'unknown'
+      : overview.errorCount
+        ? t('errors.count', { count: overview.errorCount })
+        : overview.network !== 'unknown'
         ? t(`network.${overview.network}`)
         : '';
 

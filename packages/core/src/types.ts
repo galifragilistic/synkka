@@ -48,7 +48,10 @@ export interface QueueItem {
   fileId: string;
   name: string;
   progress: number;
-  status: 'uploading' | 'queued' | 'done';
+  /** ADDED 'error': the engine gave up on this item for now (see `error`). */
+  status: 'uploading' | 'queued' | 'done' | 'error';
+  /** ADDED: user-facing explanation when status is 'error'. */
+  error?: string;
 }
 
 /** 'unknown' when the platform cannot tell (e.g. desktop): the UI hides the label. */
@@ -62,6 +65,8 @@ export interface SyncOverview {
   etaSeconds?: number;
   paused: boolean;
   conflictCount: number;
+  /** ADDED: items that failed to sync (not counted in activeCount). */
+  errorCount?: number;
 }
 
 export interface ConflictVersion {
@@ -85,6 +90,11 @@ export interface Conflict {
   local: ConflictVersion;
   /** Version on the other device. */
   remote: ConflictVersion;
+  /**
+   * ADDED (Syncthing): older conflict copies of the same file besides the one shown. Resolving
+   * moves them to version history (restorable for 30 days).
+   */
+  olderCopies?: number;
 }
 
 export type ConflictResolution = 'keepLocal' | 'keepRemote' | 'keepBoth';
@@ -135,6 +145,42 @@ export interface FileDetails {
   parentAbsolutePath?: string;
   /** Names of devices that have the current version (this device included). */
   availableOn: string[];
+  /** ADDED: why this item fails to sync on this device, if it does. */
+  syncError?: string;
+}
+
+/** ADDED (Syncthing): an archived version in a folder's version history (".stversions"). */
+export interface VersionEntry {
+  /** Unique key: folder, path and version time. */
+  id: string;
+  folderId: string;
+  folderLabel: string;
+  /** Path of the file inside the folder; restoring puts the version back here. */
+  path: string;
+  name: string;
+  /** When the version was archived (deleted, replaced, or rejected in a conflict). */
+  versionTime: string;
+  modifiedAt: string;
+  sizeBytes: number;
+}
+
+/** ADDED (Syncthing): ignore patterns of a folder (Syncthing .stignore syntax). */
+export interface IgnoreRules {
+  /** Synced to all devices (".stglobalignore", included from each device's .stignore). */
+  shared: string[];
+  /** Only on this device (the rest of .stignore). */
+  local: string[];
+}
+
+/** ADDED (Syncthing): a synced folder and which paired devices it is shared with. */
+export interface SharedFolder {
+  folderId: string;
+  /** list() id of the folder root. */
+  listId: string;
+  label: string;
+  path: string;
+  state: SyncState;
+  devices: { id: string; name: string; type: Device['type']; online: boolean; shared: boolean }[];
 }
 
 /** ADDED (Syncthing): this device's identity, shown for pairing (text + QR). */
@@ -173,4 +219,15 @@ export interface SyncService {
   dismissPendingDevice(deviceId: string): Promise<void>;
   /** Start syncing a local directory, shared with all paired devices. */
   addFolder(path: string, label: string): Promise<void>;
+  /** Unpair a device (its folders stay on this device). */
+  removeDevice(deviceId: string): Promise<void>;
+  sharedFolders(): Observable<SharedFolder[]>;
+  setFolderShared(folderId: string, deviceId: string, shared: boolean): Promise<void>;
+  getIgnores(folderId: string): Promise<IgnoreRules>;
+  setIgnores(folderId: string, rules: IgnoreRules): Promise<void>;
+  /** Stop syncing one file or folder (adds it to the folder's shared ignore rules). */
+  ignoreItem(id: string): Promise<void>;
+  /** Version history of all folders, newest first. */
+  versions(): Promise<VersionEntry[]>;
+  restoreVersion(v: VersionEntry): Promise<void>;
 }

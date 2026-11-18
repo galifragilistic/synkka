@@ -3,15 +3,17 @@ import { formatBytes, t, toPercent, type IconName, type StorageQuota } from '@sy
 import { useSync } from '../hooks';
 import { Button, Icon, ProgressBar } from './primitives';
 
-const NAV: { key: string; icon: IconName }[] = [
-  { key: 'nav.allFiles', icon: 'folder' },
-  { key: 'nav.recent', icon: 'clock' },
-  { key: 'nav.shared', icon: 'users' },
-  { key: 'nav.devices', icon: 'monitor' },
-  { key: 'nav.trash', icon: 'trash' },
+export type Section = 'all' | 'recent' | 'shared' | 'devices' | 'trash';
+
+export const NAV: { id: Section; key: string; icon: IconName }[] = [
+  { id: 'all', key: 'nav.allFiles', icon: 'folder' },
+  { id: 'recent', key: 'nav.recent', icon: 'clock' },
+  { id: 'shared', key: 'nav.shared', icon: 'users' },
+  { id: 'devices', key: 'nav.devices', icon: 'monitor' },
+  { id: 'trash', key: 'nav.trash', icon: 'trash' },
 ];
 
-export function Sidebar({ onAddFolder }: { onAddFolder: () => void }) {
+export function Sidebar({ onAddFolder, active, onSelect }: { onAddFolder: () => void; active: Section; onSelect: (s: Section) => void }) {
   const sync = useSync();
   const [quota, setQuota] = useState<StorageQuota>();
   useEffect(() => {
@@ -34,14 +36,16 @@ export function Sidebar({ onAddFolder }: { onAddFolder: () => void }) {
       </Button>
 
       <ul className="nav">
-        {NAV.map((item, i) => (
+        {NAV.map((item) => (
           <li key={item.key}>
-            {/* Only "Kaikki tiedostot" is designed; other sections are inert placeholders. */}
             <a
-              href="#"
-              className={`nav__item ${i === 0 ? 'nav__item--active' : ''}`}
-              aria-current={i === 0 ? 'page' : undefined}
-              onClick={(e) => e.preventDefault()}
+              href={`#${item.id}`}
+              className={`nav__item ${item.id === active ? 'nav__item--active' : ''}`}
+              aria-current={item.id === active ? 'page' : undefined}
+              onClick={(e) => {
+                e.preventDefault();
+                onSelect(item.id);
+              }}
             >
               <Icon name={item.icon} size={18} />
               {t(item.key)}

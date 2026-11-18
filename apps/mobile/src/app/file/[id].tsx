@@ -85,11 +85,37 @@ export default function FileScreen() {
               </View>
             </View>
 
+            {info.syncError ? (
+              <View style={styles.errorBox} accessibilityRole="alert">
+                <Icon name="alertTriangle" size={20} color={colors.status.conflict} strokeWidth={2.2} />
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text style={[font(600), { color: colors.text.dangerStrong }]}>{t('errors.title')}</Text>
+                  <Text style={[font(400, tokens.font.size.small), { color: colors.text.dangerStrong, lineHeight: 19 }]}>{info.syncError}</Text>
+                </View>
+              </View>
+            ) : null}
+
             <View style={{ gap: 10 }}>
               {isFile && info.absolutePath && (
                 <Button label={t('fileInfo.open')} icon="file" onPress={openFile} />
               )}
               <Button label={t('fileInfo.openFolder')} icon="folder" variant="secondary" onPress={openFolder} />
+              {info.relativePath ? (
+                <Button
+                  label={t('ignore.ignoreItem')}
+                  icon="close"
+                  variant="secondary"
+                  onPress={() =>
+                    service.ignoreItem(info.id).then(
+                      () => {
+                        toast(t('ignore.ignored', { name: info.name }));
+                        router.back();
+                      },
+                      (e) => toast(String(e?.message ?? e)),
+                    )
+                  }
+                />
+              ) : null}
               {info.state === 'conflict' && info.conflictId && (
                 <Button
                   label={t('fileInfo.resolve')}
@@ -136,6 +162,9 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: colors.border.default, alignItems: 'center', justifyContent: 'center',
   },
   status: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  errorBox: {
+    flexDirection: 'row', gap: 12, padding: 14, borderRadius: tokens.radius.xl, backgroundColor: colors.bg.dangerSoft,
+  },
   card: {
     backgroundColor: colors.bg.surface, borderWidth: 1, borderColor: colors.border.default,
     borderRadius: tokens.radius.xl, paddingHorizontal: 16,

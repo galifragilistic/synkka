@@ -298,6 +298,29 @@ export function createMockSyncService(opts: MockOptions = {}): MockSyncService {
     async quota(): Promise<StorageQuota> {
       return { usedBytes: Math.round(42.8 * GB), totalBytes: 200 * GB };
     },
+    async getIgnores() {
+      return { shared: ['.obsidian/workspace*.json'], local: [] };
+    },
+    async setIgnores() {},
+    async ignoreItem() {},
+    async removeDevice(deviceId) {
+      devices.set(devices.get().filter((d) => d.id !== deviceId));
+    },
+    sharedFolders: () =>
+      map(folders, (f) =>
+        (f[ROOT_FOLDER] ?? []).map((x) => ({
+          folderId: x.id, listId: x.id, label: x.name, path: `/mock/${x.name}`, state: x.state,
+          devices: devices.get().filter((d) => !d.isCurrent).map((d) => ({ id: d.id, name: d.name, type: d.type, online: d.online, shared: true })),
+        })),
+      ),
+    async setFolderShared() {},
+    async versions() {
+      return [
+        { id: 'v1', folderId: DEMO_FOLDER, folderLabel: 'Asiakasprojekti', path: 'Tarjous_v2.docx', name: 'Tarjous_v2.docx', versionTime: at(10, 5), modifiedAt: at(9, 40), sizeBytes: 231 * KB },
+        { id: 'v2', folderId: DEMO_FOLDER, folderLabel: 'Asiakasprojekti', path: 'Budjetti_2027.xlsx', name: 'Budjetti_2027.xlsx', versionTime: at(16, 10, 1), modifiedAt: at(15, 2, 1), sizeBytes: 380 * KB },
+      ];
+    },
+    async restoreVersion() {},
     async fileInfo(id) {
       const f = allFiles().find((x) => x.id === id);
       if (!f) throw new Error(`Not found: ${id}`);

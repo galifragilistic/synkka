@@ -37,7 +37,11 @@ async function createEngineService(): Promise<SyncthingSyncService> {
   let autoPaused = false;
 
   const service: SyncthingSyncService = createSyncthingService(new SyncthingClient(transport), {
-    fileOps: { rename: (from, to, overwrite) => engine.rename(from, to, overwrite) },
+    fileOps: {
+      rename: (from, to, overwrite) => engine.rename(from, to, overwrite),
+      readSharedIgnores: (p) => engine.readSharedIgnores(p),
+      writeSharedIgnores: (p, c) => engine.writeSharedIgnores(p, c),
+    },
     diskUsage: () => engine.diskUsage(),
     network: () => network,
     currentDeviceType: 'phone',

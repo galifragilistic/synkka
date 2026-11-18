@@ -28,7 +28,17 @@ export function createAppService(): AppService {
   if (!isTauri && import.meta.env.VITE_ST_PROXY) {
     // Dev: browser preview against a real Syncthing through the Vite proxy (no file access).
     const service = createSyncthingService(new SyncthingClient(fetchTransport('', '')), {
-      fileOps: { rename: async () => { throw new Error('file operations need the desktop app'); } },
+      fileOps: {
+        rename: async () => { throw new Error('file operations need the desktop app'); },
+        // Dev preview: the ignore file is reached through a tiny endpoint of the Vite dev server.
+        readSharedIgnores: async (p) => {
+          const r = await fetch(`/__synkka/ignores?path=${encodeURIComponent(p)}`);
+          return r.status === 404 ? null : r.text();
+        },
+        writeSharedIgnores: async (p, content) => {
+          await fetch(`/__synkka/ignores?path=${encodeURIComponent(p)}`, { method: 'PUT', body: content });
+        },
+      },
       diskUsage: async () => ({ usedBytes: 0, totalBytes: 1 }),
       currentDeviceType: 'computer',
     });
@@ -42,7 +52,11 @@ export function createAppService(): AppService {
   }
   const client = new SyncthingClient(tauriTransport);
   const service = createSyncthingService(client, {
-    fileOps: { rename: (from, to, overwrite) => invoke('fs_rename', { from, to, overwrite }) },
+    fileOps: {
+      rename: (from, to, overwrite) => invoke('fs_rename', { from, to, overwrite }),
+      readSharedIgnores: (folderPath) => invoke<string | null>('read_shared_ignores', { folderPath }),
+      writeSharedIgnores: (folderPath, content) => invoke('write_shared_ignores', { folderPath, content }),
+    },
     diskUsage: () => invoke<StorageQuota>('disk_usage'),
     currentDeviceType: 'computer',
     // Folders accepted from other devices land in ~/Synkka/<name> (Syncthing expands "~").

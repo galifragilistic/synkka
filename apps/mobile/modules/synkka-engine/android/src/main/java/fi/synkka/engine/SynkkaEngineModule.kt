@@ -95,6 +95,19 @@ class SynkkaEngineModule : Module() {
       EngineService.setTexts(context, texts)
     }
 
+    /** Shared ignore rules: only "<folder>/.stglobalignore" (the folder path comes from Syncthing's config). */
+    AsyncFunction("readSharedIgnores") { folderPath: String ->
+      val f = File(folderPath, ".stglobalignore")
+      if (f.isFile) f.readText() else null
+    }
+
+    AsyncFunction("writeSharedIgnores") { folderPath: String, content: String ->
+      val dir = File(folderPath)
+      if (!dir.isDirectory) throw IllegalStateException("Not a folder: $folderPath")
+      File(dir, ".stglobalignore").writeText(content)
+      Unit
+    }
+
     Function("openNotificationSettings") { channelId: String ->
       val intent = if (Build.VERSION.SDK_INT >= 26) {
         Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
