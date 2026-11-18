@@ -17,6 +17,13 @@ interface SynkkaEngineNative {
   requestAllFilesAccess(): void;
   networkType(): 'wifi' | 'cellular' | 'offline';
   deviceModel(): string;
+  setNotificationTexts(texts: Record<string, string>): void;
+  /** false when no app can open the file. */
+  openFile(path: string): boolean;
+  /** false when no file manager could be opened. */
+  openFolder(path: string): boolean;
+  /** Opens the system settings of one notification channel (e.g. to hide the idle one). */
+  openNotificationSettings(channelId: string): void;
 }
 
 /** null on platforms without the native module (web, Expo Go). */

@@ -1,12 +1,18 @@
 import { invoke } from '@tauri-apps/api/core';
 import {
-  SyncthingClient, createMockSyncService, createSyncthingService, fetchTransport,
+  SyncthingClient, createMockSyncService, createSyncthingService, fetchTransport, t,
   type EngineState, type Observable, type StorageQuota, type SyncService, type SyncthingTransport,
 } from '@synkka/core';
 
 export const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 /** Real engine available (Tauri, or the dev proxy). */
 export const isRealEngine = isTauri || !!import.meta.env.VITE_ST_PROXY;
+
+const isWindowsUA = typeof navigator !== 'undefined' && /Windows/i.test(navigator.userAgent);
+export const revealLabel = t(isWindowsUA ? 'fileInfo.revealWindows' : 'fileInfo.revealMac');
+/** Open with the default app / show in Finder; only in the desktop app (paths limited to synced folders in Rust). */
+export const openPath = isTauri ? (path: string) => invoke<void>('open_path', { path }) : null;
+export const revealPath = isTauri ? (path: string) => invoke<void>('reveal_path', { path }) : null;
 
 /** REST calls go through Rust (st_request), which holds the API key. */
 const tauriTransport: SyncthingTransport = {

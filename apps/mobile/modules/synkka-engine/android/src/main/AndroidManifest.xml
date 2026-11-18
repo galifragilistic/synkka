@@ -9,7 +9,18 @@
   <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+  <queries>
+    <intent><action android:name="android.intent.action.VIEW" /><data android:mimeType="*/*" /></intent>
+  </queries>
+
   <application>
+    <provider
+      android:name="androidx.core.content.FileProvider"
+      android:authorities="${applicationId}.synkka.files"
+      android:exported="false"
+      android:grantUriPermissions="true">
+      <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/synkka_file_paths" />
+    </provider>
     <service
       android:name="fi.synkka.engine.EngineService"
       android:exported="false"

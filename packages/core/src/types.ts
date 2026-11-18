@@ -113,6 +113,30 @@ export interface PendingDevice {
   at: string;
 }
 
+/** ADDED: details shown on the file info screen. */
+export interface FileDetails {
+  id: string;
+  name: string;
+  kind: FileItem['kind'];
+  state: SyncState;
+  progress?: number;
+  conflictId?: string;
+  sizeBytes?: number;
+  modifiedAt: string;
+  /** Name of the device that last changed the file, when known. */
+  modifiedBy?: string;
+  /** Label of the synced folder the file belongs to. */
+  folderLabel: string;
+  /** Path inside the synced folder, e.g. "Raportit/Q4.pdf". */
+  relativePath: string;
+  /** Absolute path on this device (for "open file"), when the file exists here. */
+  absolutePath?: string;
+  /** Absolute path of the directory containing the file (for "open folder"). */
+  parentAbsolutePath?: string;
+  /** Names of devices that have the current version (this device included). */
+  availableOn: string[];
+}
+
 /** ADDED (Syncthing): this device's identity, shown for pairing (text + QR). */
 export interface DeviceIdentity {
   deviceId: string;
@@ -137,6 +161,9 @@ export interface SyncService {
   settings(): Observable<SyncSettings>;
   updateSettings(p: Partial<SyncSettings>): Promise<void>;
   quota(): Promise<StorageQuota>;
+
+  /** ADDED: details for one file or folder from list()/recent(). */
+  fileInfo(id: string): Promise<FileDetails>;
 
   // ---- ADDED (Syncthing pairing & folders) ----
   myDevice(): Promise<DeviceIdentity>;

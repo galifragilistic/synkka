@@ -2,6 +2,7 @@ import { formatBytes, formatEta, t, toPercent, tokens, type QueueItem, type Sync
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SynkkaEngine } from '../../modules/synkka-engine';
 import { Icon } from '../components/Icon';
 import { Button, ProgressBar, ProgressRing, ToggleRow, styles as ui } from '../components/primitives';
 import { ScreenHeader } from '../components/ScreenHeader';
@@ -122,9 +123,25 @@ export default function SyncScreen() {
                 hint={t(s.hint)}
                 value={settings[s.key]}
                 onChange={(v) => service.updateSettings({ [s.key]: v })}
-                last={i === SETTINGS.length - 1}
+                last={i === SETTINGS.length - 1 && !SynkkaEngine}
               />
             ))}
+            {SynkkaEngine && (
+              // Android requires a notification to keep sync running; the user can hide the idle one.
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t('settings.idleNotification')}
+                accessibilityHint={t('settings.idleNotificationHint')}
+                onPress={() => SynkkaEngine?.openNotificationSettings('synkka_idle')}
+                style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.7 }]}
+              >
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text style={font(500)}>{t('settings.idleNotification')}</Text>
+                  <Text style={[font(400, tokens.font.size.label), { color: colors.text.muted }]}>{t('settings.idleNotificationHint')}</Text>
+                </View>
+                <Icon name="chevronRight" size={20} color={colors.text.muted} />
+              </Pressable>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -133,6 +150,7 @@ export default function SyncScreen() {
 }
 
 const styles = StyleSheet.create({
+  linkRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingVertical: 8 },
   content: { paddingHorizontal: 20, paddingTop: 8, gap: 20 },
   statusCard: {
     backgroundColor: colors.bg.surface, borderWidth: 1, borderColor: colors.border.default,

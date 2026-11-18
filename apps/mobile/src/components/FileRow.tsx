@@ -30,11 +30,11 @@ export function FileRow({ file: f }: { file: FileItem }) {
     ? () => router.push({ pathname: '/folder/[id]', params: { id: f.id, name: f.name } })
     : f.state === 'conflict' && f.conflictId
       ? () => router.push({ pathname: '/conflict/[id]', params: { id: f.conflictId! } })
-      : undefined;
+      : () => router.push({ pathname: '/file/[id]', params: { id: f.id } });
   return (
     <Pressable
-      disabled={!onPress}
-      accessibilityRole={onPress ? 'link' : undefined}
+      accessibilityRole="link"
+      accessibilityHint={isFolder ? undefined : t('fileInfo.details', { name: f.name })}
       accessibilityLabel={`${f.name}, ${fileMeta(f)}, ${statusA11yLabel(f)}`}
       style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}
       onPress={onPress}

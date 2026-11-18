@@ -86,7 +86,9 @@
     "photoBackup": "Kuvien varmuuskopiointi",
     "photoBackupHint": "Uudet kuvat Kuvat-kansioon",
     "batterySaver": "Akunsäästö",
-    "batterySaverHint": "Tauko, kun akkua alle 20 %"
+    "batterySaverHint": "Tauko, kun akkua alle 20 %",
+    "idleNotification": "Taustailmoitus",
+    "idleNotificationHint": "Android vaatii ilmoituksen taustasynkronointiin. Voit piilottaa sen, kun mitään ei siirretä."
   },
   "devices": {
     "title": "Laitteet",
@@ -186,5 +188,34 @@
     "starting": "Käynnistetään synkronointia…",
     "error": "Synkronointimoottori ei käynnistynyt: {error}",
     "retry": "Yritä uudelleen"
+  },
+  "fileInfo": {
+    "title": "Tiedoston tiedot",
+    "folderTitle": "Kansion tiedot",
+    "status": "Tila",
+    "size": "Koko",
+    "modified": "Muokattu",
+    "modifiedBy": "Muokkasi",
+    "location": "Sijainti",
+    "folder": "Synkattu kansio",
+    "availableOn": "Tallessa laitteilla",
+    "notHere": "Ei tällä laitteella",
+    "open": "Avaa tiedosto",
+    "openFolder": "Avaa kansio",
+    "openFailed": "Tiedostoa ei voitu avata – laitteella ei ole sopivaa sovellusta.",
+    "openFolderFailed": "Tiedostonhallintaa ei voitu avata.",
+    "resolve": "Ratkaise ristiriita",
+    "details": "Tiedot: {name}",
+    "revealMac": "Näytä Finderissa",
+    "revealWindows": "Näytä Resurssienhallinnassa",
+    "openFailedDesktop": "Tiedostoa ei voitu avata: {error}"
+  },
+  "notification": {
+    "idleChannel": "Taustasynkronointi",
+    "activeChannel": "Tiedostojen siirto",
+    "idleTitle": "Synkka",
+    "idleText": "Kaikki synkronoitu",
+    "activeOne": "Synkronoidaan {count} tiedosto",
+    "activeOther": "Synkronoidaan {count} tiedostoa"
   }
 }

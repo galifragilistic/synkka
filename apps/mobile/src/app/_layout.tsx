@@ -29,6 +29,7 @@ export default function RootLayout() {
             <Stack.Screen name="sync" />
             <Stack.Screen name="conflict/[id]" />
             <Stack.Screen name="folder/[id]" />
+            <Stack.Screen name="file/[id]" />
             <Stack.Screen name="add-folder" />
           </Stack>
         </ToastProvider>

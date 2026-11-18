@@ -47,6 +47,7 @@ export interface StFolderConfig {
   path: string;
   type: string;
   paused: boolean;
+  ignorePerms?: boolean;
   devices: StFolderDevice[];
   versioning?: { type: string; params: Record<string, string>; cleanupIntervalS?: number };
 }
@@ -111,6 +112,7 @@ export interface StNeed {
 }
 
 export interface StDbFile {
+  availability: { id: string; fromTemporary?: boolean }[] | null;
   global: { name: string; size: number; modified: string; modifiedBy: string; deleted: boolean; type: string } | null;
   local: { name: string; size: number; modified: string; modifiedBy: string; deleted: boolean } | null;
 }

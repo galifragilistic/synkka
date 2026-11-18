@@ -21,3 +21,8 @@ android {
     abortOnError false
   }
 }
+
+dependencies {
+  // FileProvider for opening synced files in other apps.
+  implementation "androidx.core:core:1.13.1"
+}

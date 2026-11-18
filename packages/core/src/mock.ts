@@ -298,6 +298,17 @@ export function createMockSyncService(opts: MockOptions = {}): MockSyncService {
     async quota(): Promise<StorageQuota> {
       return { usedBytes: Math.round(42.8 * GB), totalBytes: 200 * GB };
     },
+    async fileInfo(id) {
+      const f = allFiles().find((x) => x.id === id);
+      if (!f) throw new Error(`Not found: ${id}`);
+      const me = deviceById(currentId);
+      return {
+        id: f.id, name: f.name, kind: f.kind, state: f.state, progress: f.progress, conflictId: f.conflictId,
+        sizeBytes: f.sizeBytes, modifiedAt: f.modifiedAt, modifiedBy: me.name, folderLabel: 'Asiakasprojekti',
+        relativePath: f.name, absolutePath: `/mock/Asiakasprojekti/${f.name}`, parentAbsolutePath: '/mock/Asiakasprojekti',
+        availableOn: devices.get().filter((d) => d.online).map((d) => d.name),
+      };
+    },
     async myDevice() {
       const d = deviceById(currentId);
       return { deviceId: `${d.id.toUpperCase().padEnd(7, 'X').slice(0, 7)}-MOCKMOC-KMOCKMO-CKMOCKM-OCKMOCK-MOCKMOC-KMOCKMO-CKMOCKM`, name: d.name };

@@ -3,7 +3,7 @@
 import { keepBothCopyName } from '../conflict';
 import { Store, map } from '../observable';
 import type {
-  ActivityEvent, Conflict, ConflictResolution, ConflictVersion, Device, FileItem, Network, Observable,
+  ActivityEvent, Conflict, ConflictResolution, ConflictVersion, Device, FileDetails, FileItem, Network, Observable,
   PendingDevice, QueueItem, StorageQuota, SyncOverview, SyncService, SyncSettings,
 } from '../types';
 import {
@@ -36,6 +36,11 @@ export interface SyncthingPlatform {
   currentDeviceType: Device['type'];
   settingsStorage?: { load(): Promise<Partial<SyncSettings> | null>; save(s: SyncSettings): Promise<void> };
   onSettingsChange?: (s: SyncSettings) => void;
+  /**
+   * Ignore Unix permission bits (Android shared storage cannot keep them; without this every
+   * received file looks locally modified and is re-announced as changed by this device).
+   */
+  ignorePermissions?: boolean;
   /** Base directory for folders auto-accepted from other devices (e.g. /storage/emulated/0/Synkka). */
   defaultFolderPath?: string;
   pathSeparator?: '/' | '\\';
@@ -498,8 +503,14 @@ export function createSyncthingService(client: SyncthingClient, platform: Syncth
           .patchDefaultsFolder({
             versioning: { type: 'trashcan', params: { cleanoutDays: '30' }, cleanupIntervalS: 3600 },
             ...(platform.defaultFolderPath ? { path: platform.defaultFolderPath } : {}),
+            ...(platform.ignorePermissions ? { ignorePerms: true } : {}),
           })
           .catch(() => {});
+        if (platform.ignorePermissions) {
+          for (const f of await client.folders()) {
+            if (!f.ignorePerms) await client.patchFolder(f.id, { ignorePerms: true }).catch(() => {});
+          }
+        }
         const stored = await platform.settingsStorage?.load().catch(() => null);
         if (stored) settings.set({ ...settings.get(), ...stored });
         await refreshAll();
@@ -599,6 +610,43 @@ export function createSyncthingService(client: SyncthingClient, platform: Syncth
     },
     quota: () => platform.diskUsage(),
 
+    async fileInfo(id): Promise<FileDetails> {
+      const p = parseFolderListId(id);
+      if (!p) throw new Error(`Not a file id: ${id}`);
+      const f = folderOf(p.folder);
+      const label = f.label || f.id;
+      if (!p.path) {
+        const s = statuses[f.id];
+        return {
+          id, name: label, kind: 'folder', ...stateOf(f.id, '', true), modifiedAt: new Date().toISOString(),
+          sizeBytes: s?.localBytes, folderLabel: label, relativePath: '', absolutePath: f.path, parentAbsolutePath: f.path,
+          availableOn: [deviceName(myId), ...remoteDevicesOf(f).map(deviceName)],
+        };
+      }
+      const db = await client.file(f.id, p.path);
+      const info = db.global ?? db.local;
+      if (!info) throw new Error(`File not found: ${p.path}`);
+      const dir = isDir(db.global ?? { type: '' });
+      const localHas = !!db.local && !db.local.deleted;
+      const others = (db.availability ?? []).map((a) => a.id).filter((d) => d !== myId);
+      const by = info.modifiedBy ? deviceByShort(info.modifiedBy)?.name ?? (shortId(myId) === info.modifiedBy ? deviceName(myId) : info.modifiedBy) : undefined;
+      const slash = p.path.lastIndexOf('/');
+      return {
+        id,
+        name: basename(p.path),
+        kind: dir ? 'folder' : 'file',
+        ...stateOf(f.id, p.path, dir),
+        sizeBytes: dir ? undefined : info.size,
+        modifiedAt: info.modified,
+        modifiedBy: by,
+        folderLabel: label,
+        relativePath: p.path,
+        absolutePath: localHas ? join(f.path, p.path) : undefined,
+        parentAbsolutePath: slash > 0 ? join(f.path, p.path.slice(0, slash)) : f.path.replace(/[\\/]+$/, ''),
+        availableOn: [...(localHas ? [deviceName(myId)] : []), ...others.map(deviceName)],
+      };
+    },
+
     async myDevice() {
       if (!myId) myId = (await client.status()).myID;
       return { deviceId: myId, name: deviceName(myId) };
@@ -628,6 +676,7 @@ export function createSyncthingService(client: SyncthingClient, platform: Syncth
         label: label || basename(path),
         path,
         type: 'sendreceive',
+        ...(platform.ignorePermissions ? { ignorePerms: true } : {}),
         devices: devCfg.map((d) => ({ deviceID: d.deviceID })),
         versioning: { type: 'trashcan', params: { cleanoutDays: '30' }, cleanupIntervalS: 3600 },
       });

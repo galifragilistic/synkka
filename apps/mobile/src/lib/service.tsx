@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
+  t,
   createMockSyncService, createSyncthingService, fetchTransport, SyncthingClient,
   type EngineState, type Network, type Observable, type SyncService, type SyncSettings, type SyncthingSyncService,
 } from '@synkka/core';
@@ -22,6 +23,15 @@ async function createEngineService(): Promise<SyncthingSyncService> {
     await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS).catch(() => undefined);
   }
   const { port, apiKey } = await engine.start();
+  // Notification copy comes from fi.json like the rest of the UI.
+  engine.setNotificationTexts({
+    idleChannel: t('notification.idleChannel'),
+    activeChannel: t('notification.activeChannel'),
+    idleTitle: t('notification.idleTitle'),
+    idleText: t('notification.idleText'),
+    activeOne: t('notification.activeOne', { count: '{count}' }),
+    activeOther: t('notification.activeOther', { count: '{count}' }),
+  });
   const transport = fetchTransport(`http://127.0.0.1:${port}`, apiKey);
   let network: Network = engine.networkType();
   let autoPaused = false;
@@ -31,6 +41,7 @@ async function createEngineService(): Promise<SyncthingSyncService> {
     diskUsage: () => engine.diskUsage(),
     network: () => network,
     currentDeviceType: 'phone',
+    ignorePermissions: true,
     defaultFolderPath: DEFAULT_FOLDER_PATH,
     settingsStorage: {
       async load() {

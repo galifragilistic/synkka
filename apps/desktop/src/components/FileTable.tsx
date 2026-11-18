@@ -2,7 +2,9 @@ import { formatBytes, formatModified, t, type FileItem } from '@synkka/core';
 import { Icon } from './primitives';
 import { SyncStatusBadge } from './SyncStatusBadge';
 
-function FileRow({ file, now, onResolve, onOpen }: { file: FileItem; now: Date; onResolve: (id: string) => void; onOpen: (f: FileItem) => void }) {
+function FileRow({ file, now, onResolve, onOpen, onDetails }: {
+  file: FileItem; now: Date; onResolve: (id: string) => void; onOpen: (f: FileItem) => void; onDetails: (f: FileItem) => void;
+}) {
   const isFolder = file.kind === 'folder';
   const size =
     isFolder && file.childCount !== undefined
@@ -21,7 +23,15 @@ function FileRow({ file, now, onResolve, onOpen }: { file: FileItem; now: Date; 
             {file.name}
           </button>
         ) : (
-          <span className="ellipsis">{file.name}</span>
+          <button
+            type="button"
+            className="ftable__open ellipsis"
+            aria-haspopup="dialog"
+            title={t('fileInfo.details', { name: file.name })}
+            onClick={() => onDetails(file)}
+          >
+            {file.name}
+          </button>
         )}
       </div>
       <div role="cell">
@@ -34,8 +44,9 @@ function FileRow({ file, now, onResolve, onOpen }: { file: FileItem; now: Date; 
 }
 
 export function FileTable({
-  files, now, onResolve, onOpen, label, empty,
+  files, now, onResolve, onOpen, onDetails, label, empty,
 }: {
+  onDetails: (f: FileItem) => void;
   files: FileItem[];
   now: Date;
   onResolve: (id: string) => void;
@@ -53,7 +64,7 @@ export function FileTable({
           <span role="columnheader" className="ftable__size">{t('table.size')}</span>
         </div>
         {files.map((f) => (
-          <FileRow key={f.id} file={f} now={now} onResolve={onResolve} onOpen={onOpen} />
+          <FileRow key={f.id} file={f} now={now} onResolve={onResolve} onOpen={onOpen} onDetails={onDetails} />
         ))}
         {files.length === 0 && empty && <p className="ftable__empty muted">{empty}</p>}
       </div>

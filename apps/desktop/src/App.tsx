@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DEMO_FOLDER, ROOT, t, type EngineState, type FileItem, type Observable, type PendingDevice } from '@synkka/core';
 import { useDebounced, useNow, useObservable, useSync } from './hooks';
-import { isRealEngine, isTauri } from './platform';
+import { isRealEngine, isTauri, revealLabel, revealPath } from './platform';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
 import { FileTable } from './components/FileTable';
 import { SidePanel } from './components/SidePanel';
 import { ConflictDialog } from './components/ConflictDialog';
 import { PairingDialog } from './components/PairingDialog';
+import { FileDetailsDialog } from './components/FileDetailsDialog';
 import { Button, Icon } from './components/primitives';
 
 type Crumb = { id: string; name: string };
@@ -33,6 +34,18 @@ export function App({ engine }: { engine?: Observable<EngineState> }) {
   );
 
   const [conflictId, setConflictId] = useState<string | null>(null);
+  const [detailsId, setDetailsId] = useState<string | null>(null);
+  const closeDetails = useCallback(() => setDetailsId(null), []);
+  const showError = useCallback((m: string) => setToast(m), []);
+  const revealCurrent = async () => {
+    try {
+      const info = await sync.fileInfo(current.id);
+      const dir = info.absolutePath ?? info.parentAbsolutePath;
+      if (dir && revealPath) await revealPath(dir);
+    } catch (e) {
+      setToast(t('fileInfo.openFailedDesktop', { error: String((e as Error)?.message ?? e) }));
+    }
+  };
   const [pairing, setPairing] = useState<{ prefill?: PendingDevice } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   useEffect(() => {
@@ -102,6 +115,13 @@ export function App({ engine }: { engine?: Observable<EngineState> }) {
                 )}
                 <h1 id="folder-title">{current.name}</h1>
               </div>
+              {!atRoot && revealPath && (
+                <div className="files__actions">
+                  <Button size="sm" icon="folder" onClick={revealCurrent}>
+                    {revealLabel}
+                  </Button>
+                </div>
+              )}
               {atRoot && isRealEngine && (
                 <div className="files__actions">
                   <Button size="sm" icon="plus" onClick={addFolder}>
@@ -115,6 +135,7 @@ export function App({ engine }: { engine?: Observable<EngineState> }) {
               now={now}
               onResolve={setConflictId}
               onOpen={open}
+              onDetails={(f) => setDetailsId(f.id)}
               label={current.name}
               empty={engineState?.state === 'ready' ? t(atRoot ? 'folders.none' : 'folders.empty') : undefined}
             />
@@ -124,6 +145,9 @@ export function App({ engine }: { engine?: Observable<EngineState> }) {
       </main>
 
       {conflictId && <ConflictDialog conflictId={conflictId} onClose={closeDialog} onResolved={resolved} />}
+      {detailsId && (
+        <FileDetailsDialog fileId={detailsId} onClose={closeDetails} onResolve={setConflictId} onError={showError} />
+      )}
       {pairing && (
         <PairingDialog
           initialId={pairing.prefill?.deviceId}

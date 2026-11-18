@@ -259,6 +259,22 @@ a:hover, .link:hover { color: var(--accent-strong); }
 .field__error { margin: 0; color: var(--status-conflict); font-size: 13px; font-weight: 600; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
 
+/* ---------- file details ---------- */
+.file-hero { display: flex; align-items: center; gap: 14px; }
+.file-hero__text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.file-hero__name { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.details {
+  margin: 0; padding: 4px 16px; border: 1px solid var(--border-default); border-radius: var(--radius-xl);
+  display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 16px;
+}
+.details dt, .details dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--border-divider); font-size: 13px; }
+.details dt { color: var(--text-muted); }
+.details dd { font-weight: 500; overflow-wrap: anywhere; }
+.details dt:last-of-type, .details dd:last-of-type { border-bottom: none; }
+.details__path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; font-weight: 400; }
+.details__devices { display: flex; flex-direction: column; gap: 6px; }
+.details__device { color: var(--text-primary); }
+
 /* ---------- toast ---------- */
 .toast-region { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10; }
 .toast {

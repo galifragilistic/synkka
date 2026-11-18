@@ -69,7 +69,12 @@ async fn st_request(
 }
 
 fn expand_home(p: &str) -> PathBuf {
-    if let Some(rest) = p.strip_prefix("~/") {
+    if p == "~" {
+        if let Some(home) = std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE")) {
+            return PathBuf::from(home);
+        }
+    }
+    if let Some(rest) = p.strip_prefix("~/").or_else(|| p.strip_prefix("~\\")) {
         if let Some(home) = std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE")) {
             return PathBuf::from(home).join(rest);
         }
@@ -104,7 +109,8 @@ fn is_inside(p: &Path, roots: &[PathBuf]) -> bool {
 #[tauri::command]
 async fn fs_rename(engine: State<'_, Engine>, from: String, to: String, overwrite: bool) -> Result<(), String> {
     let roots = folder_roots(&engine).await?;
-    let (from, to) = (PathBuf::from(from), PathBuf::from(to));
+    // Paths come from Syncthing's folder config and may start with "~".
+    let (from, to) = (expand_home(&from), expand_home(&to));
     if !is_inside(&from, &roots) || !is_inside(&to, &roots) {
         return Err("path outside synced folders".into());
     }
@@ -136,6 +142,46 @@ async fn disk_usage(engine: State<'_, Engine>) -> Result<DiskUsage, String> {
     let total = fs2::total_space(&path).map_err(|e| e.to_string())?;
     let avail = fs2::available_space(&path).map_err(|e| e.to_string())?;
     Ok(DiskUsage { used_bytes: total.saturating_sub(avail), total_bytes: total })
+}
+
+fn is_inside_or_root(p: &Path, roots: &[PathBuf]) -> bool {
+    p.is_absolute()
+        && !p.components().any(|c| matches!(c, Component::ParentDir))
+        && roots.iter().any(|r| p.starts_with(r))
+}
+
+/// Opens a synced file with its default app (Finder's "Open" / Explorer double-click).
+#[tauri::command]
+async fn open_path(engine: State<'_, Engine>, path: String) -> Result<(), String> {
+    let roots = folder_roots(&engine).await?;
+    let p = expand_home(&path);
+    if !is_inside_or_root(&p, &roots) || !p.exists() {
+        return Err("path outside synced folders".into());
+    }
+    #[cfg(target_os = "macos")]
+    let status = std::process::Command::new("open").arg(&p).status();
+    #[cfg(target_os = "windows")]
+    let status = std::process::Command::new("explorer").arg(&p).status();
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    let status = std::process::Command::new("xdg-open").arg(&p).status();
+    status.map(|_| ()).map_err(|e| e.to_string())
+}
+
+/// Shows a synced file or folder in Finder / Explorer (selected in its parent window).
+#[tauri::command]
+async fn reveal_path(engine: State<'_, Engine>, path: String) -> Result<(), String> {
+    let roots = folder_roots(&engine).await?;
+    let p = expand_home(&path);
+    if !is_inside_or_root(&p, &roots) || !p.exists() {
+        return Err("path outside synced folders".into());
+    }
+    #[cfg(target_os = "macos")]
+    let status = std::process::Command::new("open").arg("-R").arg(&p).status();
+    #[cfg(target_os = "windows")]
+    let status = std::process::Command::new("explorer").arg(format!("/select,{}", p.display())).status();
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    let status = std::process::Command::new("xdg-open").arg(p.parent().unwrap_or(&p)).status();
+    status.map(|_| ()).map_err(|e| e.to_string())
 }
 
 /// Host name without the macOS ".local" suffix, used as the default device name.
@@ -221,6 +267,24 @@ fn stop_engine(engine: &Engine) {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn expands_home_and_limits_paths_to_synced_folders() {
+        let home = std::env::var("HOME").unwrap();
+        let roots = vec![expand_home("~/Synkka/Testi")];
+        assert_eq!(roots[0], PathBuf::from(format!("{home}/Synkka/Testi")));
+        assert!(is_inside(&expand_home("~/Synkka/Testi/a.txt"), &roots));
+        assert!(!is_inside(&expand_home("~/Synkka/Testi"), &roots)); // the root itself can't be moved
+        assert!(is_inside_or_root(&expand_home("~/Synkka/Testi"), &roots));
+        assert!(!is_inside(&expand_home("~/Synkka/Testi/../../.ssh/id_rsa"), &roots));
+        assert!(!is_inside(&PathBuf::from("/etc/passwd"), &roots));
+        assert!(!is_inside(&PathBuf::from("Synkka/Testi/a.txt"), &roots)); // relative
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -239,7 +303,7 @@ pub fn run() {
             app.manage(engine);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![st_request, fs_rename, disk_usage, host_name])
+        .invoke_handler(tauri::generate_handler![st_request, fs_rename, disk_usage, host_name, open_path, reveal_path])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app, event| {
