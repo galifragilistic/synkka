@@ -56,12 +56,33 @@ pub fn create(app: &tauri::App) -> tauri::Result<()> {
     let sep = || PredefinedMenuItem::separator(app);
     let menu = Menu::with_items(app, &[&status, &toggle, &sep()?, &open, &login, &sep()?, &quit])?;
 
+    // macOS tints a black template image for the menu bar. Windows shows icons as they are, so a
+    // black glyph would vanish on the dark taskbar: use the coloured app icon there.
+    #[cfg(target_os = "macos")]
+    let icon = Image::from_bytes(include_bytes!("../icons/tray-template.png"))?;
+    #[cfg(not(target_os = "macos"))]
+    let icon = Image::from_bytes(include_bytes!("../icons/32x32.png"))?;
+
     TrayIconBuilder::with_id(TRAY_ID)
-        .icon(Image::from_bytes(include_bytes!("../icons/tray-template.png"))?)
-        .icon_as_template(true)
+        .icon(icon)
+        .icon_as_template(cfg!(target_os = "macos"))
         .tooltip("Synkka")
         .menu(&menu)
-        .show_menu_on_left_click(true)
+        // macOS: click opens the menu. Windows: click opens the window, right click the menu.
+        .show_menu_on_left_click(cfg!(target_os = "macos"))
+        .on_tray_icon_event(|tray, event| {
+            #[cfg(not(target_os = "macos"))]
+            if let tauri::tray::TrayIconEvent::Click {
+                button: tauri::tray::MouseButton::Left,
+                button_state: tauri::tray::MouseButtonState::Up,
+                ..
+            } = event
+            {
+                show_main_window(tray.app_handle());
+            }
+            #[cfg(target_os = "macos")]
+            let _ = (tray, event);
+        })
         .on_menu_event(|app, event| match event.id().as_ref() {
             "open" => show_main_window(app),
             "toggle" => {

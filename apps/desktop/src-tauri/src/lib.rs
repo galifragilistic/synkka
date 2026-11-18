@@ -72,13 +72,13 @@ async fn st_request(
 
 fn expand_home(p: &str) -> PathBuf {
     if p == "~" {
-        if let Some(home) = std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE")) {
-            return PathBuf::from(home);
+        if let Some(home) = home_dir() {
+            return home;
         }
     }
     if let Some(rest) = p.strip_prefix("~/").or_else(|| p.strip_prefix("~\\")) {
-        if let Some(home) = std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE")) {
-            return PathBuf::from(home).join(rest);
+        if let Some(home) = home_dir() {
+            return home.join(rest);
         }
     }
     PathBuf::from(p)
@@ -139,7 +139,7 @@ async fn disk_usage(engine: State<'_, Engine>) -> Result<DiskUsage, String> {
     let path = roots
         .into_iter()
         .find(|p| p.exists())
-        .or_else(|| std::env::var_os("HOME").map(PathBuf::from))
+        .or_else(home_dir)
         .unwrap_or_else(|| PathBuf::from("/"));
     let total = fs2::total_space(&path).map_err(|e| e.to_string())?;
     let avail = fs2::available_space(&path).map_err(|e| e.to_string())?;
@@ -179,8 +179,13 @@ async fn reveal_path(engine: State<'_, Engine>, path: String) -> Result<(), Stri
     }
     #[cfg(target_os = "macos")]
     let status = std::process::Command::new("open").arg("-R").arg(&p).status();
+    // Explorer parses its own command line: the path must be quoted after "/select," as-is,
+    // which Rust's argument escaping would not produce for paths with spaces.
     #[cfg(target_os = "windows")]
-    let status = std::process::Command::new("explorer").arg(format!("/select,{}", p.display())).status();
+    let status = {
+        use std::os::windows::process::CommandExt;
+        std::process::Command::new("explorer").raw_arg(format!("/select,\"{}\"", p.display())).status()
+    };
     #[cfg(not(any(target_os = "macos", target_os = "windows")))]
     let status = std::process::Command::new("xdg-open").arg(p.parent().unwrap_or(&p)).status();
     status.map(|_| ()).map_err(|e| e.to_string())
@@ -217,15 +222,21 @@ async fn write_shared_ignores(engine: State<'_, Engine>, folder_path: String, co
 /// Host name without the macOS ".local" suffix, used as the default device name.
 #[tauri::command]
 fn host_name() -> String {
-    std::process::Command::new("scutil")
+    #[cfg(target_os = "macos")]
+    let name = std::process::Command::new("scutil")
         .args(["--get", "ComputerName"])
         .output()
         .ok()
         .filter(|o| o.status.success())
         .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
-        .filter(|s| !s.is_empty())
-        .or_else(|| std::env::var("COMPUTERNAME").ok())
-        .unwrap_or_default()
+        .filter(|s| !s.is_empty());
+    #[cfg(not(target_os = "macos"))]
+    let name: Option<String> = None;
+    name.or_else(|| std::env::var("COMPUTERNAME").ok()).unwrap_or_default()
+}
+
+fn home_dir() -> Option<PathBuf> {
+    std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE")).map(PathBuf::from)
 }
 
 fn start_engine(app: &tauri::App) -> Result<Engine, Box<dyn std::error::Error>> {
@@ -303,14 +314,16 @@ mod tests {
 
     #[test]
     fn expands_home_and_limits_paths_to_synced_folders() {
-        let home = std::env::var("HOME").unwrap();
+        let home = home_dir().unwrap();
         let roots = vec![expand_home("~/Synkka/Testi")];
-        assert_eq!(roots[0], PathBuf::from(format!("{home}/Synkka/Testi")));
+        assert_eq!(roots[0], home.join("Synkka/Testi"));
+        assert_eq!(expand_home("~\\Synkka\\Testi"), home.join("Synkka\\Testi"));
         assert!(is_inside(&expand_home("~/Synkka/Testi/a.txt"), &roots));
         assert!(!is_inside(&expand_home("~/Synkka/Testi"), &roots)); // the root itself can't be moved
         assert!(is_inside_or_root(&expand_home("~/Synkka/Testi"), &roots));
         assert!(!is_inside(&expand_home("~/Synkka/Testi/../../.ssh/id_rsa"), &roots));
         assert!(!is_inside(&PathBuf::from("/etc/passwd"), &roots));
+        assert!(!is_inside(&PathBuf::from("C:\\Windows\\win.ini"), &roots));
         assert!(!is_inside(&PathBuf::from("Synkka/Testi/a.txt"), &roots)); // relative
     }
 }
@@ -318,6 +331,10 @@ mod tests {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // Must be registered first. A second launch (Start menu, desktop shortcut) would start a
+        // second Syncthing on the same database; instead it shows the running app's window.
+        // macOS gets this from LaunchServices (RunEvent::Reopen below).
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| tray::show_main_window(app)))
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())

@@ -50,6 +50,27 @@ npm run mobile:android
   Valmiit paketit kopioidaan kansioon `dist/` (gitignoroitu).
   Sovellus vaatii development buildin (ei Expo Go:ta), koska se käyttää react-native-svg:tä ja fontteja.
 
+## Windows-asennuspaketit paikallisesti
+
+Tarvitaan Rust (`winget install Rustlang.Rustup`), Visual Studio 2022:n tai Build Toolsin
+**Desktop development with C++** -työkuorma (MSVC + Windows SDK) sekä Node 26. WebView2 on
+Windows 11:ssä valmiina.
+
+```powershell
+node scripts/fetch-syncthing.mjs windows
+```
+
+```powershell
+cd apps/desktop; npx tauri build --bundles msi,nsis
+```
+
+Tulos: `apps/desktop/src-tauri/target/release/bundle/msi/*.msi` ja `.../bundle/nsis/*-setup.exe`.
+Paketit eivät ole allekirjoitettuja, joten SmartScreen varoittaa ensimmäisellä asennuskerralla.
+
+Windowsilla Synkka toimii ilmoitusalueelta: vasen klikkaus avaa ikkunan, oikea klikkaus valikon.
+Uusi käynnistys samalla kun sovellus on jo käynnissä tuo olemassa olevan ikkunan esiin
+(ei toista Syncthing-moottoria).
+
 ## Android-APK paikallisesti
 
 Asennettu tälle koneelle: JDK 17 (`brew install openjdk@17`), komentorivityökalut
