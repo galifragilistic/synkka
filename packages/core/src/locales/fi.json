@@ -67,6 +67,10 @@
       "one": "Synkronoidaan {count} tiedosto",
       "other": "Synkronoidaan {count} tiedostoa"
     },
+    "waiting": {
+      "one": "{count} tiedosto odottaa yhteyttä",
+      "other": "{count} tiedostoa odottaa yhteyttä"
+    },
     "conflictsWaiting": {
       "one": "{count} ristiriita odottaa ratkaisua",
       "other": "{count} ristiriitaa odottaa ratkaisua"

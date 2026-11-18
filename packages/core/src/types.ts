@@ -67,6 +67,8 @@ export interface SyncOverview {
   conflictCount: number;
   /** ADDED: items that failed to sync (not counted in activeCount). */
   errorCount?: number;
+  /** ADDED: items this device needs while no device sharing their folder is online (not in activeCount). */
+  waitingCount?: number;
 }
 
 export interface ConflictVersion {

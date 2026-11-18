@@ -27,7 +27,9 @@ export default function FilesScreen() {
     ? t('sync.paused')
     : overview.activeCount > 0
       ? t('sync.activeCount', { count: overview.activeCount })
-      : t('sync.allSynced');
+      : overview.waitingCount
+        ? t('sync.waiting', { count: overview.waitingCount })
+        : t('sync.allSynced');
   const bannerSubtitle =
     overview.conflictCount > 0
       ? t('sync.conflictsWaiting', { count: overview.conflictCount })

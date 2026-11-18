@@ -8,6 +8,7 @@ export function pill(o: SyncOverview | undefined): { tone: string; icon: IconNam
   if (o.paused) return { tone: 'paused', icon: 'pause', text: t('sync.paused') };
   if (o.activeCount > 0) return { tone: 'active', icon: 'sync', text: t('sync.activeCount', { count: o.activeCount }) };
   if (o.errorCount) return { tone: 'error', icon: 'alertTriangle', text: t('errors.count', { count: o.errorCount }) };
+  if (o.waitingCount) return { tone: 'idle', icon: 'clock', text: t('sync.waiting', { count: o.waitingCount }) };
   return { tone: 'active', icon: 'checkCircle', text: t('sync.allSynced') };
 }
 

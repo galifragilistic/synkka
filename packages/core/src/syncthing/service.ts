@@ -143,13 +143,15 @@ export function createSyncthingService(client: SyncthingClient, platform: Syncth
   function rootItems(): FileItem[] {
     return folderCfg.map((f) => {
       const s = statuses[f.id];
-      const busy = s && s.needTotalItems > 0;
+      const needs = !!s && s.needTotalItems > 0;
+      const reachable = remoteDevicesOf(f).some((d) => !!conns?.connections[d]?.connected);
+      const busy = needs && reachable;
       const hasConflict = [...conflictMap.values()].some((c) => parseFolderListId(c.fileId)!.folder === f.id);
       return {
         id: folderListId(f.id),
         name: f.label || f.id,
         kind: 'folder',
-        state: hasConflict ? 'conflict' : busy ? 'syncing' : 'synced',
+        state: hasConflict ? 'conflict' : busy ? 'syncing' : needs ? 'pending' : 'synced',
         progress: busy && s.globalBytes ? s.inSyncBytes / s.globalBytes : undefined,
         modifiedAt: new Date().toISOString(),
         childCount: s ? s.localFiles : undefined,
@@ -385,13 +387,20 @@ export function createSyncthingService(client: SyncthingClient, platform: Syncth
     let activeCount = 0;
     let needBytes = 0;
     let errorCount = 0;
+    let waitingCount = 0;
     for (const f of folderCfg) {
       const s = statuses[f.id];
       if (s) {
         // Items that failed (e.g. a name Android can't store) wait for a fix, not for transfer.
         const failed = pullErrors[f.id]?.size ?? 0;
-        activeCount += Math.max(0, s.needFiles - failed);
-        needBytes += s.needBytes;
+        const need = Math.max(0, s.needFiles - failed);
+        // With every device of the folder offline there is no one to transfer from: waiting.
+        if (remoteDevicesOf(f).some(remoteConnected)) {
+          activeCount += need;
+          needBytes += s.needBytes;
+        } else {
+          waitingCount += need;
+        }
         errorCount += failed;
       }
       for (const d of remoteDevicesOf(f)) {
@@ -414,6 +423,7 @@ export function createSyncthingService(client: SyncthingClient, platform: Syncth
       paused,
       conflictCount: conflictMap.size,
       errorCount,
+      waitingCount,
     });
     if (needBytes === 0 && activeCount === 0) passMax = 0;
 

@@ -14,7 +14,7 @@ import java.net.URL
  */
 object EngineMonitor {
   private const val TAG = "SynkkaMonitor"
-  private const val EVENTS = "FolderSummary,FolderCompletion,StateChanged,DeviceDisconnected,ConfigSaved"
+  private const val EVENTS = "FolderSummary,FolderCompletion,StateChanged,DeviceConnected,DeviceDisconnected,ConfigSaved"
   private val TRANSFER_STATES = setOf("syncing", "sync-preparing")
 
   @Volatile private var thread: Thread? = null
@@ -24,6 +24,9 @@ object EngineMonitor {
   /** Items a connected remote device still needs from us, per "folder|device". */
   private val remoteNeed = HashMap<String, Int>()
   private val folderState = HashMap<String, String>()
+  /** Other devices sharing each folder, and which devices are connected now. */
+  private val folderPeers = HashMap<String, Set<String>>()
+  private val connected = HashSet<String>()
   private var lastReported: Int? = null
 
   @Synchronized
@@ -57,10 +60,16 @@ object EngineMonitor {
   }
 
   private fun seed() {
-    localNeed.clear(); remoteNeed.clear(); folderState.clear()
+    localNeed.clear(); remoteNeed.clear(); folderState.clear(); folderPeers.clear(); connected.clear()
+    val myId = JSONObject(get("/rest/system/status", 10_000)).optString("myID")
+    val conns = JSONObject(get("/rest/system/connections", 10_000)).optJSONObject("connections") ?: JSONObject()
+    for (dev in conns.keys()) if (conns.getJSONObject(dev).optBoolean("connected")) connected.add(dev)
     val folders = JSONArray(get("/rest/config/folders", 10_000))
     for (i in 0 until folders.length()) {
-      val id = folders.getJSONObject(i).getString("id")
+      val folder = folders.getJSONObject(i)
+      val id = folder.getString("id")
+      val devs = folder.optJSONArray("devices") ?: JSONArray()
+      folderPeers[id] = (0 until devs.length()).map { devs.getJSONObject(it).getString("deviceID") }.filter { it != myId }.toSet()
       val status = JSONObject(get("/rest/db/status?folder=${java.net.URLEncoder.encode(id, "UTF-8")}", 10_000))
       localNeed[id] = waiting(status)
       folderState[id] = status.optString("state", "idle")
@@ -71,10 +80,13 @@ object EngineMonitor {
   private fun waiting(status: JSONObject): Int =
     maxOf(0, status.optInt("needTotalItems", 0) - status.optInt("pullErrors", 0))
 
+  /** A folder can transfer only while some device sharing it is online. */
+  private fun reachable(folder: String) = folderPeers[folder].orEmpty().any { it in connected }
+
   private fun activeCount(): Int {
-    val local = localNeed.values.sum()
+    val local = localNeed.filterKeys(::reachable).values.sum()
     val remote = remoteNeed.values.sum()
-    val busyState = folderState.values.any { it in TRANSFER_STATES }
+    val busyState = folderState.any { (f, st) -> st in TRANSFER_STATES && reachable(f) }
     val n = local + remote
     return if (n == 0 && busyState) 1 else n
   }
@@ -109,8 +121,10 @@ object EngineMonitor {
             "FolderSummary" -> localNeed[data.getString("folder")] = waiting(data.getJSONObject("summary"))
             "FolderCompletion" -> remoteNeed["${data.getString("folder")}|${data.getString("device")}"] = data.optInt("needItems", 0)
             "StateChanged" -> folderState[data.getString("folder")] = data.optString("to", "idle")
+            "DeviceConnected" -> connected.add(data.optString("id"))
             "DeviceDisconnected" -> {
               val dev = data.optString("id")
+              connected.remove(dev)
               remoteNeed.keys.removeAll { it.endsWith("|$dev") }
             }
             "ConfigSaved" -> needSeed = true

@@ -38,7 +38,9 @@ export default function SyncScreen() {
   const title = overview.paused
     ? t('sync.paused')
     : idle
-      ? t('sync.allSynced')
+      ? overview.waitingCount
+        ? t('sync.waiting', { count: overview.waitingCount })
+        : t('sync.allSynced')
       : t('sync.activeCount', { count: overview.activeCount });
   const network = overview.network === 'unknown' ? '' : t(`network.${overview.network}`);
   const subtitle =
