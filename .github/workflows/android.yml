@@ -6,6 +6,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  NDK_VERSION: 27.1.12297006
+  SYNCTHING_VERSION: v2.1.7
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -19,16 +23,41 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27'
+          cache: false
+
+      # The runner image ships the Android SDK (ANDROID_HOME) with licences accepted;
+      # only the NDK version the build uses needs adding.
+      - name: Install Android NDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;${NDK_VERSION}" > /dev/null
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
+
       - run: npm ci
       - run: npm test
       - run: npm run typecheck -w @synkka/mobile
+
+      - name: Cache Syncthing source and Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/synkka
+            ~/go/pkg/mod
+          key: syncthing-${{ env.SYNCTHING_VERSION }}-go1.27-${{ runner.os }}
+      - name: Build Syncthing engine for Android (arm64)
+        working-directory: apps/mobile
+        run: ABIS=arm64-v8a bash scripts/build-syncthing-android.sh
+
       - name: Generate native Android project
         working-directory: apps/mobile
         run: npx expo prebuild --platform android --no-install
       - name: Build APK (release, signed with the debug key)
         working-directory: apps/mobile/android
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
+      - name: Check the engine is inside the APK
+        run: unzip -l apps/mobile/android/app/build/outputs/apk/release/app-release.apk | grep 'lib/arm64-v8a/libsyncthing.so'
       - uses: actions/upload-artifact@v4
         with:
           name: synkka-android-apk
