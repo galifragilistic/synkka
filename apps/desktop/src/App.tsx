@@ -16,6 +16,7 @@ import { PairingDialog } from './components/PairingDialog';
 import { FileDetailsDialog } from './components/FileDetailsDialog';
 import { IgnoreDialog } from './components/IgnoreDialog';
 import { Button, Icon } from './components/primitives';
+import { useTray } from './tray';
 
 type Crumb = { id: string; name: string };
 
@@ -24,6 +25,7 @@ export function App({ engine }: { engine?: Observable<EngineState> }) {
   const now = useNow();
   const engineState = useObservable(() => engine ?? { subscribe: (l) => (l({ state: 'ready' }), () => {}) }, [engine]);
   const overview = useObservable(() => sync.overview(), [sync]);
+  useTray(overview);
 
   // The browser mock has one designed folder; the real engine starts at the folder list.
   const [stack, setStack] = useState<Crumb[]>(() =>

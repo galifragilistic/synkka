@@ -2,7 +2,8 @@ import { t, type IconName, type SyncOverview } from '@synkka/core';
 import { useSync } from '../hooks';
 import { Button, Icon, IconButton } from './primitives';
 
-function pill(o: SyncOverview | undefined): { tone: string; icon: IconName; text: string } {
+/** Sync state summary shown in the top bar pill and the menu bar menu. */
+export function pill(o: SyncOverview | undefined): { tone: string; icon: IconName; text: string } {
   if (!o) return { tone: 'idle', icon: 'sync', text: '' };
   if (o.paused) return { tone: 'paused', icon: 'pause', text: t('sync.paused') };
   if (o.activeCount > 0) return { tone: 'active', icon: 'sync', text: t('sync.activeCount', { count: o.activeCount }) };

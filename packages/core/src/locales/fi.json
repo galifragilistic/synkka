@@ -268,5 +268,12 @@
       "other": "{count} tiedostoa ei synkronoidu"
     },
     "title": "Ei synkronoidu"
+  },
+  "tray": {
+    "open": "Avaa Synkka",
+    "launchAtLogin": "Käynnistä kirjautuessa",
+    "quit": "Lopeta Synkka",
+    "pause": "Keskeytä synkronointi",
+    "resume": "Jatka synkronointia"
   }
 }

@@ -46,3 +46,12 @@ render('android-icon-foreground.png', glyph(ADAPTIVE_SCALE, '#FFFFFF'));
 render('android-icon-monochrome.png', glyph(ADAPTIVE_SCALE, '#000000'));
 render('splash-icon.png', macStyle, 512);
 render('favicon.png', macStyle, 48);
+
+// macOS menu bar (template image: black + alpha, macOS tints it for light/dark menu bars).
+// 22 pt tall at @2x; the glyph keeps a small margin like other menu bar icons.
+{
+  const tray = `<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="-2 -2 28 28"><g fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${GLYPH}</g></svg>`;
+  const file = 'apps/desktop/src-tauri/icons/tray-template.png';
+  writeFileSync(path.join(root, file), new Resvg(tray, { fitTo: { mode: 'width', value: 44 }, background: 'rgba(0,0,0,0)' }).render().asPng());
+  console.log(`→ ${file} (44px)`);
+}

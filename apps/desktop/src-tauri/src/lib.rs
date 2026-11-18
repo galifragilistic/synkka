@@ -11,7 +11,9 @@ use std::{
 
 use serde::Serialize;
 use serde_json::Value;
-use tauri::{Manager, RunEvent, State};
+use tauri::{Manager, RunEvent, State, WindowEvent};
+
+mod tray;
 use tauri_plugin_shell::{
     process::{CommandChild, CommandEvent},
     ShellExt,
@@ -319,7 +321,18 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            Some(vec![tray::HIDDEN_ARG]),
+        ))
         .setup(|app| {
+            // Menu bar app: no Dock icon, the window opens from the tray menu.
+            #[cfg(target_os = "macos")]
+            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            tray::create(app)?;
+            if !std::env::args().any(|a| a == tray::HIDDEN_ARG) {
+                tray::show_main_window(app.handle());
+            }
             if cfg!(debug_assertions) {
                 app.handle().plugin(
                     tauri_plugin_log::Builder::default()
@@ -331,14 +344,29 @@ pub fn run() {
             app.manage(engine);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![st_request, fs_rename, disk_usage, host_name, open_path, reveal_path, read_shared_ignores, write_shared_ignores])
+        .on_window_event(|window, event| {
+            // Closing hides the window; syncing goes on in the background.
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                if window.label() == "main" {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
+            }
+        })
+        .invoke_handler(tauri::generate_handler![st_request, fs_rename, disk_usage, host_name, open_path, reveal_path, read_shared_ignores, write_shared_ignores, tray::tray_update])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app, event| {
-            if let RunEvent::Exit = event {
-                if let Some(engine) = app.try_state::<Engine>() {
-                    stop_engine(&engine);
+            match event {
+                RunEvent::Exit => {
+                    if let Some(engine) = app.try_state::<Engine>() {
+                        stop_engine(&engine);
+                    }
                 }
+                // Launched again from Finder/Spotlight while already running.
+                #[cfg(target_os = "macos")]
+                RunEvent::Reopen { .. } => tray::show_main_window(app),
+                _ => {}
             }
         });
 }
