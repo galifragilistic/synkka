@@ -28,9 +28,11 @@ jobs:
           - os: macos-latest
             args: --target universal-apple-darwin --bundles app,dmg
             rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
+            syncthing: macos
           - os: windows-latest
             args: --bundles msi,nsis
             rust-targets: ''
+            syncthing: windows
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -45,6 +47,8 @@ jobs:
         with:
           workspaces: apps/desktop/src-tauri -> target
       - run: npm ci
+      - name: Fetch Syncthing engine (checksum-verified)
+        run: node scripts/fetch-syncthing.mjs ${{ matrix.syncthing }}
       - name: Build Tauri app
         working-directory: apps/desktop
         run: npx tauri build ${{ matrix.args }}

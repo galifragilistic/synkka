@@ -38,10 +38,10 @@ export default function SyncScreen() {
     : idle
       ? t('sync.allSynced')
       : t('sync.activeCount', { count: overview.activeCount });
-  const network = t(`network.${overview.network}`);
+  const network = overview.network === 'unknown' ? '' : t(`network.${overview.network}`);
   const subtitle =
     overview.etaSeconds && !overview.paused
-      ? t('sync.networkEta', { network, eta: formatEta(overview.etaSeconds) })
+      ? t('sync.networkEta', { network, eta: formatEta(overview.etaSeconds) }).replace(/^ · /, '')
       : network;
 
   return (

@@ -230,6 +230,35 @@ a:hover, .link:hover { color: var(--accent-strong); }
 .radio-card__title { font-weight: 600; }
 .radio-card__meta { font-size: 13px; color: var(--text-muted); }
 
+/* ---------- navigation, banners, pairing ---------- */
+.ftable__open { border: none; background: none; padding: 0; text-align: left; cursor: pointer; color: inherit; font-weight: 500; }
+.ftable__open:hover { color: var(--accent-strong); text-decoration: underline; }
+.ftable__empty { margin: 0; padding: 20px; text-align: center; }
+.crumbs__link { border: none; background: none; padding: 0; color: var(--accent); font-weight: 600; cursor: pointer; }
+.crumbs__link:hover { color: var(--accent-strong); text-decoration: underline; }
+.banner {
+  display: flex; align-items: center; gap: 8px; margin: 16px 28px 0; padding: 12px 16px;
+  border-radius: var(--radius-lg); background: var(--bg-accent-soft); color: var(--accent-strong); font-size: 13px; font-weight: 600;
+}
+.banner--error { background: var(--bg-danger-soft); color: var(--text-danger-strong); }
+.pending { display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: var(--radius-lg); background: var(--bg-accent-soft); }
+.pending__actions { display: flex; gap: 8px; }
+.pair-me__row { display: flex; gap: 16px; align-items: flex-start; }
+.pair-me__qr { width: 120px; height: 120px; flex-shrink: 0; padding: 8px; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--bg-surface); }
+.pair-me__qr svg { width: 100%; height: 100%; display: block; }
+.pair-me__text { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; min-width: 0; }
+.device-id { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.5; word-break: break-all; color: var(--text-primary); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field__label { font-size: 13px; font-weight: 600; }
+.field__input {
+  height: 40px; padding: 0 12px; border-radius: var(--radius-md); border: 1px solid var(--border-control);
+  background: var(--bg-surface); color: var(--text-primary); font-size: 14px;
+}
+.field__input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+.field__input[aria-invalid="true"] { border-color: var(--status-conflict); }
+.field__error { margin: 0; color: var(--status-conflict); font-size: 13px; font-weight: 600; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+
 /* ---------- toast ---------- */
 .toast-region { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10; }
 .toast {

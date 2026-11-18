@@ -18,6 +18,15 @@
         "export PATH=$HOME/.nvm/versions/node/v26.6.0/bin:$PATH && cd apps/mobile && CI=1 npx expo start --web --port 8082 --clear"
       ],
       "port": 8082
+    },
+    {
+      "name": "desktop-web-syncthing",
+      "runtimeExecutable": "/bin/zsh",
+      "runtimeArgs": [
+        "-c",
+        "export PATH=$HOME/.nvm/versions/node/v26.6.0/bin:$PATH && cd apps/desktop && SYNKKA_ST_URL=http://127.0.0.1:18384 SYNKKA_ST_KEY=testkeyA npx vite --port 1421 --strictPort"
+      ],
+      "port": 1421
     }
   ]
 }

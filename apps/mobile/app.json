@@ -2,7 +2,7 @@
   "expo": {
     "name": "Synkka",
     "slug": "synkka",
-    "version": "1.0.0",
+    "version": "0.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -18,7 +18,8 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "fi.synkka.app"
+      "package": "fi.synkka.app",
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -27,7 +28,16 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true,
+            "useLegacyPackaging": true
+          }
+        }
+      ]
     ],
     "scheme": "synkka"
   }

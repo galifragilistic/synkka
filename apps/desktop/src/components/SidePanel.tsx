@@ -1,10 +1,12 @@
-import { formatAgo, formatWhen, t, type Device } from '@synkka/core';
+import { formatAgo, formatWhen, t, type Device, type PendingDevice } from '@synkka/core';
 import { useObservable, useSync } from '../hooks';
-import { Icon } from './primitives';
+import { Button, Icon } from './primitives';
 
 function deviceState(d: Device, now: Date): string {
   if (d.isCurrent && d.activity === 'syncing') return t('devices.syncingNow');
+  if (d.online && !d.isCurrent && d.activity === 'syncing') return t('devices.syncingNow');
   if (d.online) return t('devices.upToDate', { ago: formatAgo(d.lastSyncAt, now) });
+  if (!d.lastSyncAt) return t('devices.offline');
   return t('devices.lastSeen', { when: formatWhen(d.lastSyncAt, now) });
 }
 
@@ -30,20 +32,51 @@ function DeviceRow({ device, now }: { device: Device; now: Date }) {
   );
 }
 
-export function SidePanel({ now }: { now: Date }) {
+function PendingRow({ p, onAccept, onDismiss }: { p: PendingDevice; onAccept: () => void; onDismiss: () => void }) {
+  return (
+    <li className="pending" role="group" aria-label={t('pairing.pendingTitle')}>
+      <span className="small">
+        <strong>{t('pairing.pendingTitle')}</strong>
+      </span>
+      <span className="muted label">{t('pairing.pendingBody', { name: p.name, id: p.deviceId.slice(0, 7) })}</span>
+      <span className="pending__actions">
+        <Button size="sm" variant="primary" onClick={onAccept}>
+          {t('pairing.accept')}
+        </Button>
+        <Button size="sm" onClick={onDismiss}>
+          {t('pairing.dismiss')}
+        </Button>
+      </span>
+    </li>
+  );
+}
+
+export function SidePanel({ now, onPair }: { now: Date; onPair: (prefill?: PendingDevice) => void }) {
   const sync = useSync();
   const devices = useObservable(() => sync.devices(), [sync]) ?? [];
-  const activity = useObservable(() => sync.activity(3), [sync]) ?? [];
+  const pending = useObservable(() => sync.pendingDevices(), [sync]) ?? [];
+  const activity = useObservable(() => sync.activity(5), [sync]) ?? [];
 
   return (
     <aside className="sidepanel">
       <section className="card panel" aria-labelledby="devices-title">
         <h2 id="devices-title">{t('devices.title')}</h2>
+        {pending.length > 0 && (
+          <ul className="plain-list panel__list">
+            {pending.map((p) => (
+              <PendingRow key={p.deviceId} p={p} onAccept={() => onPair(p)} onDismiss={() => sync.dismissPendingDevice(p.deviceId)} />
+            ))}
+          </ul>
+        )}
         <ul className="plain-list panel__list">
           {devices.map((d) => (
             <DeviceRow key={d.id} device={d} now={now} />
           ))}
         </ul>
+        {devices.length <= 1 && <p className="muted small note">{t('pairing.noDevices')}</p>}
+        <Button size="sm" icon="plus" onClick={() => onPair()}>
+          {t('pairing.add')}
+        </Button>
       </section>
 
       <section className="card panel" aria-labelledby="activity-title">
@@ -58,10 +91,6 @@ export function SidePanel({ now }: { now: Date }) {
             </li>
           ))}
         </ul>
-        {/* Full history view is not designed yet. */}
-        <a href="#" className="link small" onClick={(e) => e.preventDefault()}>
-          {t('actions.showHistory')}
-        </a>
       </section>
     </aside>
   );

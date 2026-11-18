@@ -24,7 +24,10 @@ export function conflictOptions(conflict: Conflict, now: Date = new Date(), t: T
     {
       id: 'keepLocal',
       icon: deviceIcon(conflict.local),
-      title: t('conflict.thisDeviceVersion', { deviceGenitive: conflict.local.deviceGenitive }),
+      // With three devices neither version may come from this one; then don't say "Tämän …".
+      title: t(conflict.local.isCurrentDevice === false ? 'conflict.versionOf' : 'conflict.thisDeviceVersion', {
+        deviceGenitive: conflict.local.deviceGenitive,
+      }),
       meta: meta(conflict.local),
       cta: t('conflict.cta.keepLocal', { deviceGenitive: conflict.local.deviceGenitive }),
     },

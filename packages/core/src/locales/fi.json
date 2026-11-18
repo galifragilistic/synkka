@@ -49,7 +49,7 @@
   },
   "status": {
     "synced": "Synkronoitu",
-    "syncing": "Lähetetään {pct} %",
+    "syncing": "Siirretään {pct} %",
     "pending": "Jonossa",
     "conflict": "Ristiriita",
     "conflictAction": "Ristiriita – ratkaise",
@@ -57,7 +57,7 @@
     "offlineAvailable": "Tallennettu laitteelle",
     "done": "Valmis",
     "twoVersions": "Kaksi versiota",
-    "syncingShort": "Lähetetään · {pct} %",
+    "syncingShort": "Siirretään · {pct} %",
     "modifiedAt": "Muokattu {when}",
     "queued": "Jonossa"
   },
@@ -101,7 +101,10 @@
     "title": "Viimeisin toiminta",
     "editedHere": "muokattu tällä laitteella",
     "editedConcurrently": "muokattu kahdella laitteella samaan aikaan",
-    "sharedWith": "jaettu {count} henkilölle"
+    "sharedWith": "jaettu {count} henkilölle",
+    "editedOn": "muokattu laitteella {device}",
+    "deletedHere": "poistettu tällä laitteella",
+    "deletedOn": "poistettu laitteella {device}"
   },
   "conflict": {
     "title": "Ratkaise ristiriita",
@@ -133,7 +136,8 @@
   },
   "_notes": {
     "deviceGenitive": "Finnish genitive of the device name, e.g. iPhone → iPhonen, MacBook Pro → MacBook Pron / MacBookin. Store it per device (Device.nameGenitive); do not append 'n' automatically.",
-    "added": "Keys added during implementation (not in handover): status.syncingShort, status.modifiedAt, status.queued, sync.bytesProgress, sync.percent, network.*, storage.percent, common.*, conflict.dialogLabel, time.yesterdayAt, time.todayAt, time.etaMinutes, files.folders, files.recent; plural forms {one, other} for table.items, sync.activeCount, sync.conflictsWaiting."
+    "added": "Keys added during implementation (not in handover): status.syncingShort, status.modifiedAt, status.queued, sync.bytesProgress, sync.percent, network.*, storage.percent, common.*, conflict.dialogLabel, time.yesterdayAt, time.todayAt, time.etaMinutes, files.folders, files.recent; plural forms {one, other} for table.items, sync.activeCount, sync.conflictsWaiting.",
+    "syncthing": "Syncthing-era changes: status.syncing 'Lähetetään'→'Siirretään' (P2P both sends and receives); added activity.editedOn/deletedHere/deletedOn, pairing.*, folders.*, engine.*."
   },
   "network": {
     "wifi": "Wi-Fi",
@@ -147,5 +151,40 @@
   "files": {
     "folders": "Kansiot",
     "recent": "Viimeisimmät"
+  },
+  "pairing": {
+    "title": "Lisää laite",
+    "myId": "Tämän laitteen tunniste",
+    "myIdHint": "Syötä tämä tunniste toiselle laitteelle tai skannaa QR-koodi sillä.",
+    "copy": "Kopioi tunniste",
+    "copied": "Tunniste kopioitu",
+    "otherId": "Toisen laitteen tunniste",
+    "otherIdPlaceholder": "XXXXXXX-XXXXXXX-XXXXXXX-…",
+    "name": "Laitteen nimi",
+    "namePlaceholder": "Esim. Työaseman PC",
+    "add": "Lisää laite",
+    "invalidId": "Tunniste ei kelpaa",
+    "added": "Laite lisätty",
+    "pendingTitle": "Uusi laite haluaa yhdistää",
+    "pendingBody": "{name} · {id}",
+    "accept": "Hyväksy",
+    "dismiss": "Hylkää",
+    "scan": "Skannaa QR-koodi",
+    "noDevices": "Ei vielä muita laitteita. Lisää laite aloittaaksesi synkronoinnin."
+  },
+  "folders": {
+    "add": "Lisää kansio",
+    "path": "Kansion polku",
+    "pathPlaceholder": "/storage/emulated/0/Synkka",
+    "label": "Nimi",
+    "added": "Kansio lisätty",
+    "empty": "Kansio on tyhjä",
+    "none": "Ei vielä synkronoitavia kansioita.",
+    "choose": "Valitse kansio"
+  },
+  "engine": {
+    "starting": "Käynnistetään synkronointia…",
+    "error": "Synkronointimoottori ei käynnistynyt: {error}",
+    "retry": "Yritä uudelleen"
   }
 }

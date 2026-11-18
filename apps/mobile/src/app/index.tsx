@@ -1,29 +1,15 @@
-import {
-  formatWhen, ROOT_FOLDER, statusA11yLabel, statusColor, statusMeta, t, toPercent, tokens, type FileItem,
-} from '@synkka/core';
+import { ROOT_FOLDER, t, tokens } from '@synkka/core';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FileRow } from '../components/FileRow';
 import { Icon } from '../components/Icon';
 import { IconButton } from '../components/primitives';
 import { TabBar } from '../components/TabBar';
 import { useDebounced } from '../lib/hooks';
 import { useObservable } from '../lib/service';
 import { accent, colors, font, overline } from '../lib/theme';
-
-function recentMeta(f: FileItem): string {
-  switch (f.state) {
-    case 'syncing':
-      return t('status.syncingShort', { pct: toPercent(f.progress ?? 0) });
-    case 'conflict':
-      return t('status.twoVersions');
-    case 'offlineAvailable':
-      return t('status.offlineAvailable');
-    default:
-      return t('status.modifiedAt', { when: formatWhen(f.modifiedAt) });
-  }
-}
 
 export default function FilesScreen() {
   const insets = useSafeAreaInsets();
@@ -43,14 +29,18 @@ export default function FilesScreen() {
       ? t('sync.activeCount', { count: overview.activeCount })
       : t('sync.allSynced');
   const bannerSubtitle =
-    overview.conflictCount > 0 ? t('sync.conflictsWaiting', { count: overview.conflictCount }) : t(`network.${overview.network}`);
+    overview.conflictCount > 0
+      ? t('sync.conflictsWaiting', { count: overview.conflictCount })
+      : overview.network !== 'unknown'
+        ? t(`network.${overview.network}`)
+        : '';
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg.canvas }}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <View style={styles.titleRow}>
           <Text accessibilityRole="header" style={styles.h1}>{t('nav.tabFiles')}</Text>
-          <IconButton icon="plus" label={t('actions.addFile')} round background={accent} color={colors.text.onAccent} />
+          <IconButton icon="plus" label={t('folders.add')} round background={accent} color={colors.text.onAccent} onPress={() => router.push('/add-folder')} />
         </View>
         <View style={styles.search}>
           <Icon name="search" size={tokens.size.iconSm} color={colors.text.muted} />
@@ -78,7 +68,7 @@ export default function FilesScreen() {
           </View>
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={font(600)}>{bannerTitle}</Text>
-            <Text style={[font(400, tokens.font.size.small), { color: colors.text.secondary }]}>{bannerSubtitle}</Text>
+            {bannerSubtitle ? <Text style={[font(400, tokens.font.size.small), { color: colors.text.secondary }]}>{bannerSubtitle}</Text> : null}
           </View>
           <Icon name="chevronRight" size={tokens.size.iconMd} color={colors.text.secondary} />
         </Pressable>
@@ -88,11 +78,12 @@ export default function FilesScreen() {
             <Text accessibilityRole="header" style={overline}>{t('files.folders')}</Text>
             <View style={styles.grid}>
               {shownFolders.map((f) => (
-                <View
+                <Pressable
                   key={f.id}
-                  accessible
+                  accessibilityRole="link"
                   accessibilityLabel={`${f.name}, ${t('table.items', { count: f.childCount ?? 0 })}`}
-                  style={styles.folderCard}
+                  onPress={() => router.push({ pathname: '/folder/[id]', params: { id: f.id, name: f.name } })}
+                  style={({ pressed }) => [styles.folderCard, pressed && { opacity: 0.85 }]}
                 >
                   <Icon name="folder" size={tokens.size.iconLg} color={accent} />
                   <View style={{ gap: 2 }}>
@@ -101,40 +92,17 @@ export default function FilesScreen() {
                       {t('table.items', { count: f.childCount ?? 0 })}
                     </Text>
                   </View>
-                </View>
+                </Pressable>
               ))}
             </View>
           </View>
-        ) : null}
+        ) : (
+          <Text style={[font(400, tokens.font.size.small), { color: colors.text.muted }]}>{t('folders.none')}</Text>
+        )}
 
         <View style={{ gap: 4 }}>
           <Text accessibilityRole="header" style={[overline, { marginBottom: 8 }]}>{t('nav.recent')}</Text>
-          {shownRecent.map((f) => {
-            const meta = statusMeta(f.state);
-            const onPress = f.state === 'conflict' && f.conflictId
-              ? () => router.push({ pathname: '/conflict/[id]', params: { id: f.conflictId! } })
-              : undefined;
-            return (
-              <Pressable
-                key={f.id}
-                disabled={!onPress}
-                accessibilityRole={onPress ? 'link' : undefined}
-                style={styles.recentRow}
-                onPress={onPress}
-              >
-                <View style={styles.fileTile}>
-                  <Icon name="file" size={tokens.size.iconMd} color={colors.text.secondary} />
-                </View>
-                <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-                  <Text style={font(500)} numberOfLines={1}>{f.name}</Text>
-                  <Text style={[font(400, tokens.font.size.small), { color: colors.text.muted }]}>{recentMeta(f)}</Text>
-                </View>
-                <View accessible accessibilityRole="image" accessibilityLabel={statusA11yLabel(f)}>
-                  <Icon name={meta.icon} size={20} color={statusColor(meta.iconColor)} strokeWidth={2.2} />
-                </View>
-              </Pressable>
-            );
-          })}
+          {shownRecent.map((f) => <FileRow key={f.id} file={f} />)}
         </View>
       </ScrollView>
 

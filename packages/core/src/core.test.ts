@@ -36,7 +36,7 @@ describe('status mapping', () => {
     expect(statusLabel(f('synced'))).toBe('Synkronoitu');
     expect(statusColor(STATUS_META.synced.textColor)).toBe(tokens.color.status.syncedText);
     expect(STATUS_META.syncing.icon).toBe('sync');
-    expect(statusLabel(f('syncing', 0.64))).toBe('Lähetetään 64 %');
+    expect(statusLabel(f('syncing', 0.64))).toBe('Siirretään 64 %');
     expect(STATUS_META.syncing.showProgress).toBe(true);
     expect(STATUS_META.pending.icon).toBe('clock');
     expect(statusLabel(f('pending'))).toBe('Jonossa');

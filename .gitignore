@@ -6,3 +6,8 @@ apps/mobile/ios/
 apps/desktop/src-tauri/target/
 *.log
 .DS_Store
+
+# Syncthing sidecar binaries (fetched by scripts/fetch-syncthing.mjs)
+apps/desktop/src-tauri/binaries/syncthing-*
+apps/mobile/modules/*/android/build/
+apps/mobile/modules/*/android/.gradle/

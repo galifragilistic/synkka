@@ -2,7 +2,7 @@ import { formatBytes, formatModified, t, type FileItem } from '@synkka/core';
 import { Icon } from './primitives';
 import { SyncStatusBadge } from './SyncStatusBadge';
 
-function FileRow({ file, now, onResolve }: { file: FileItem; now: Date; onResolve: (id: string) => void }) {
+function FileRow({ file, now, onResolve, onOpen }: { file: FileItem; now: Date; onResolve: (id: string) => void; onOpen: (f: FileItem) => void }) {
   const isFolder = file.kind === 'folder';
   const size =
     isFolder && file.childCount !== undefined
@@ -16,7 +16,13 @@ function FileRow({ file, now, onResolve }: { file: FileItem; now: Date; onResolv
         <span className={`icon-tile ${isFolder ? 'icon-tile--folder' : ''}`} aria-hidden="true">
           <Icon name={isFolder ? 'folder' : 'file'} size={18} />
         </span>
-        <span className="ellipsis">{file.name}</span>
+        {isFolder ? (
+          <button type="button" className="ftable__open ellipsis" onClick={() => onOpen(file)}>
+            {file.name}
+          </button>
+        ) : (
+          <span className="ellipsis">{file.name}</span>
+        )}
       </div>
       <div role="cell">
         <SyncStatusBadge file={file} onResolve={onResolve} />
@@ -27,10 +33,19 @@ function FileRow({ file, now, onResolve }: { file: FileItem; now: Date; onResolv
   );
 }
 
-export function FileTable({ files, now, onResolve }: { files: FileItem[]; now: Date; onResolve: (id: string) => void }) {
+export function FileTable({
+  files, now, onResolve, onOpen, label, empty,
+}: {
+  files: FileItem[];
+  now: Date;
+  onResolve: (id: string) => void;
+  onOpen: (f: FileItem) => void;
+  label: string;
+  empty?: string;
+}) {
   return (
     <div className="card ftable-scroll">
-      <div className="ftable" role="table" aria-label={t('nav.allFiles')}>
+      <div className="ftable" role="table" aria-label={label}>
         <div className="ftable__row ftable__head" role="row">
           <span role="columnheader">{t('table.name')}</span>
           <span role="columnheader">{t('table.status')}</span>
@@ -38,8 +53,9 @@ export function FileTable({ files, now, onResolve }: { files: FileItem[]; now: D
           <span role="columnheader" className="ftable__size">{t('table.size')}</span>
         </div>
         {files.map((f) => (
-          <FileRow key={f.id} file={f} now={now} onResolve={onResolve} />
+          <FileRow key={f.id} file={f} now={now} onResolve={onResolve} onOpen={onOpen} />
         ))}
+        {files.length === 0 && empty && <p className="ftable__empty muted">{empty}</p>}
       </div>
     </div>
   );

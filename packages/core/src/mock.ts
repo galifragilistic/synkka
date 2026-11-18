@@ -4,7 +4,7 @@ import { keepBothCopyName } from './conflict';
 import { map, Store } from './observable';
 import type {
   ActivityEvent, Conflict, ConflictResolution, ConflictVersion, Device, FileItem, QueueItem,
-  StorageQuota, SyncOverview, SyncService, SyncSettings, Network,
+  StorageQuota, SyncOverview, SyncService, SyncSettings, Network, PendingDevice,
 } from './types';
 
 const KB = 1024;
@@ -124,6 +124,7 @@ export function createMockSyncService(opts: MockOptions = {}): MockSyncService {
   ]);
   let done: QueueItem[] = [{ fileId: 'img4821', name: 'IMG_4821.heic', progress: 1, status: 'done' }];
 
+  const pending = new Store<PendingDevice[]>([]);
   const settings = new Store<SyncSettings>({ wifiOnly: true, photoBackup: true, batterySaver: false });
 
   let paused = false;
@@ -296,6 +297,25 @@ export function createMockSyncService(opts: MockOptions = {}): MockSyncService {
     },
     async quota(): Promise<StorageQuota> {
       return { usedBytes: Math.round(42.8 * GB), totalBytes: 200 * GB };
+    },
+    async myDevice() {
+      const d = deviceById(currentId);
+      return { deviceId: `${d.id.toUpperCase().padEnd(7, 'X').slice(0, 7)}-MOCKMOC-KMOCKMO-CKMOCKM-OCKMOCK-MOCKMOC-KMOCKMO-CKMOCKM`, name: d.name };
+    },
+    pendingDevices: () => pending,
+    async addDevice(deviceId, name) {
+      pending.set(pending.get().filter((p) => p.deviceId !== deviceId));
+      devices.set([
+        ...devices.get(),
+        { id: deviceId, name, nameGenitive: `laitteen ${name}`, type: 'computer', isCurrent: false, online: true, lastSyncAt: now().toISOString(), activity: 'idle' },
+      ]);
+    },
+    async dismissPendingDevice(deviceId) {
+      pending.set(pending.get().filter((p) => p.deviceId !== deviceId));
+    },
+    async addFolder(path, label) {
+      const id = `f-${label.toLowerCase()}`;
+      addFile(ROOT_FOLDER, { id, name: label || path, kind: 'folder', state: 'synced', modifiedAt: now().toISOString(), childCount: 0 });
     },
     tick,
     dispose() {

@@ -1,0 +1,23 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'fi.synkka'
+version = '0.1.0'
+
+android {
+  namespace "fi.synkka.engine"
+  defaultConfig {
+    versionCode 1
+    versionName "0.1.0"
+  }
+  packagingOptions {
+    // libsyncthing.so is a Go executable, not a JNI library: keep it intact.
+    doNotStrip "**/libsyncthing.so"
+    jniLibs { useLegacyPackaging true }
+  }
+  lintOptions {
+    abortOnError false
+  }
+}

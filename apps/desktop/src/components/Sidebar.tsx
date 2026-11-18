@@ -11,7 +11,7 @@ const NAV: { key: string; icon: IconName }[] = [
   { key: 'nav.trash', icon: 'trash' },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onAddFolder }: { onAddFolder: () => void }) {
   const sync = useSync();
   const [quota, setQuota] = useState<StorageQuota>();
   useEffect(() => {
@@ -28,9 +28,9 @@ export function Sidebar() {
         <span className="logo__name">{t('app.name')}</span>
       </div>
 
-      {/* Upload flow is not designed yet (spec §7). */}
-      <Button variant="primary" size="lg" icon="plus">
-        {t('actions.addFiles')}
+      {/* Syncthing syncs folders, so the primary action adds a folder to sync. */}
+      <Button variant="primary" size="lg" icon="plus" onClick={onAddFolder}>
+        {t('folders.add')}
       </Button>
 
       <ul className="nav">

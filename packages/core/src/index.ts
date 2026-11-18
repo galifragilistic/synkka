@@ -7,3 +7,6 @@ export * from './status';
 export * from './conflict';
 export * from './observable';
 export * from './mock';
+export * from './syncthing/client';
+export * from './syncthing/conflicts';
+export * from './syncthing/service';

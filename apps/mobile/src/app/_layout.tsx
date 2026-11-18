@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ToastProvider } from '../components/Toast';
+import { PermissionGate } from '../components/PermissionGate';
 import { SyncServiceProvider } from '../lib/service';
 
 export default function RootLayout() {
@@ -11,6 +12,7 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
   return (
     <SafeAreaProvider>
+      <PermissionGate>
       <SyncServiceProvider>
         <ToastProvider>
           <StatusBar style="dark" />
@@ -26,9 +28,12 @@ export default function RootLayout() {
             <Stack.Screen name="account" options={{ animation: 'none' }} />
             <Stack.Screen name="sync" />
             <Stack.Screen name="conflict/[id]" />
+            <Stack.Screen name="folder/[id]" />
+            <Stack.Screen name="add-folder" />
           </Stack>
         </ToastProvider>
       </SyncServiceProvider>
+      </PermissionGate>
     </SafeAreaProvider>
   );
 }

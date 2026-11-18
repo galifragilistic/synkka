@@ -51,7 +51,8 @@ export interface QueueItem {
   status: 'uploading' | 'queued' | 'done';
 }
 
-export type Network = 'wifi' | 'cellular' | 'offline';
+/** 'unknown' when the platform cannot tell (e.g. desktop): the UI hides the label. */
+export type Network = 'wifi' | 'cellular' | 'offline' | 'unknown';
 
 export interface SyncOverview {
   activeCount: number;
@@ -70,6 +71,8 @@ export interface ConflictVersion {
   deviceGenitive: string;
   /** ADDED: needed for the device icon in the radio card. */
   deviceType: Device['type'];
+  /** ADDED: true when this version was made on the device running the app. */
+  isCurrentDevice?: boolean;
   modifiedAt: string;
   sizeBytes: number;
 }
@@ -102,6 +105,20 @@ export interface Observable<T> {
   subscribe(listener: (value: T) => void): () => void;
 }
 
+/** ADDED (Syncthing): a device that tried to connect and is not yet accepted. */
+export interface PendingDevice {
+  deviceId: string;
+  name: string;
+  address?: string;
+  at: string;
+}
+
+/** ADDED (Syncthing): this device's identity, shown for pairing (text + QR). */
+export interface DeviceIdentity {
+  deviceId: string;
+  name: string;
+}
+
 export interface SyncService {
   overview(): Observable<SyncOverview>;
   list(folderId: string): Observable<FileItem[]>;
@@ -120,4 +137,13 @@ export interface SyncService {
   settings(): Observable<SyncSettings>;
   updateSettings(p: Partial<SyncSettings>): Promise<void>;
   quota(): Promise<StorageQuota>;
+
+  // ---- ADDED (Syncthing pairing & folders) ----
+  myDevice(): Promise<DeviceIdentity>;
+  pendingDevices(): Observable<PendingDevice[]>;
+  /** Pair with a device by ID; shares all folders with it and auto-accepts its folders. */
+  addDevice(deviceId: string, name: string): Promise<void>;
+  dismissPendingDevice(deviceId: string): Promise<void>;
+  /** Start syncing a local directory, shared with all paired devices. */
+  addFolder(path: string, label: string): Promise<void>;
 }

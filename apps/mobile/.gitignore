@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Syncthing engine binaries (built by scripts/build-syncthing-android.sh)
+modules/synkka-engine/android/src/main/jniLibs/
